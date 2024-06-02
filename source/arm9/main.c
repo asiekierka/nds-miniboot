@@ -69,7 +69,7 @@ int main(void) {
     // Ensure ARM9 has control over the cartridge slots.
     // Restoring this variable to its previous state is required!
     uint16_t old_exmemcnt = REG_EXMEMCNT;
-    REG_EXMEMCNT = 0x4000; // ARM9 memory priority, ARM9 slot access, "slow" GBA timings
+    REG_EXMEMCNT = 0x6000; // ARM9 memory priority, ARM9 slot access, "slow" GBA timings
 
     // If holding START while booting, or DEBUG is defined, enable 
     // debug output.
