@@ -1,0 +1,148 @@
+# SPDX-License-Identifier: CC0-1.0
+#
+# SPDX-FileContributor: Adrian "asie" Siekierka, 2024
+
+export WONDERFUL_TOOLCHAIN ?= /opt/wonderful
+export BLOCKSDS ?= /opt/wonderful/thirdparty/blocksds/core
+
+# Configuration
+# -------------
+
+SOURCEDIRS	:= source/common source/common/libc
+ASSETDIRS	:=
+ifeq ($(CPU),arm9)
+SOURCEDIRS	+= fatfs/source source/arm9 source/arm9/fatfs
+ASSETDIRS	+= source/arm9
+else
+ifeq ($(CPU),arm7)
+SOURCEDIRS	+= source/arm7
+else
+$(error no CPU defined)
+endif
+endif
+INCLUDEDIRS	:= $(SOURCEDIRS)
+
+BUILDDIR	:= build/$(CPU)
+BIN		:= build/$(CPU).bin
+ELF		:= build/$(CPU).elf
+MAP		:= build/$(CPU).map
+
+# Tools
+# -----
+
+CC		:= $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/bin/arm-none-eabi-gcc
+OBJCOPY		:= $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/bin/arm-none-eabi-objcopy
+MKDIR		:= mkdir
+RM		:= rm -rf
+
+# Verbose flag
+# ------------
+
+ifeq ($(V),1)
+_V		:=
+else
+_V		:= @
+endif
+
+# Source files
+# ------------
+
+ifneq ($(ASSETDIRS),)
+SOURCES_BIN	:= $(shell find -L $(ASSETDIRS) -maxdepth 1 -name "*.bin")
+INCLUDEDIRS	+= $(addprefix $(BUILDDIR)/,$(ASSETDIRS))
+else
+SOURCES_BIN	:=
+endif
+
+SOURCES_S	:= $(shell find -L $(SOURCEDIRS) -maxdepth 1 -name "*.s")
+SOURCES_C	:= $(shell find -L $(SOURCEDIRS) -maxdepth 1 -name "*.c")
+
+# Compiler and linker flags
+# -------------------------
+
+DEFINES		:=
+
+ifeq ($(CPU),arm9)
+DEFINES		+= -DARM9
+else
+ifeq ($(CPU),arm7)
+DEFINES		+= -DARM7
+endif
+endif
+
+WARNFLAGS	:= -Wall
+
+INCLUDEFLAGS	:= $(foreach path,$(INCLUDEDIRS),-I$(path))
+
+ASFLAGS		:= -x assembler-with-cpp $(DEFINES) \
+		   $(INCLUDEFLAGS) -ffunction-sections -fdata-sections
+
+CFLAGS		:= -std=gnu2x $(WARNFLAGS) $(DEFINES) -ffreestanding -nostdlib \
+		   $(INCLUDEFLAGS) -ffunction-sections -fdata-sections -O2 -flto
+
+LDFLAGS		:= $(DEFINES) -Wl,-Map,$(MAP) -Wl,--gc-sections -nostdlib -lgcc \
+		   -Wl,--no-warn-rwx-segments -Tsource/$(CPU).ld -flto
+
+ifeq ($(CPU),arm9)
+CFLAGS		+= -marm -mcpu=arm946e-s+nofp
+LDFLAGS		+= -Wl,--use-blx
+else
+ifeq ($(CPU),arm7)
+CFLAGS		+= -marm -mcpu=arm7tdmi
+endif
+endif
+
+# Intermediate build files
+# ------------------------
+
+OBJS_ASSETS	:= $(addsuffix .o,$(addprefix $(BUILDDIR)/,$(SOURCES_BIN)))
+
+OBJS_SOURCES	:= $(addsuffix .o,$(addprefix $(BUILDDIR)/,$(SOURCES_S))) \
+		   $(addsuffix .o,$(addprefix $(BUILDDIR)/,$(SOURCES_C)))
+
+OBJS		:= $(OBJS_ASSETS) $(OBJS_SOURCES)
+
+DEPS		:= $(OBJS:.o=.d)
+
+# Targets
+# -------
+
+.PHONY: all clean
+
+all: $(BIN)
+
+$(BIN): $(ELF)
+	@echo "  BIN     $@"
+	$(V)$(OBJCOPY) -O binary $(ELF) $(BIN)
+
+$(ELF): $(OBJS)
+	@echo "  LINK    $@"
+	$(_V)$(CC) -o $@ $(OBJS) $(LDFLAGS)
+
+clean:
+	@echo "  CLEAN"
+	$(_V)$(RM) $(ELF) $(BUILDDIR)
+
+# Rules
+# -----
+
+$(BUILDDIR)/%.s.o : %.s | $(OBJS_ASSETS)
+	@echo "  AS      $<"
+	@$(MKDIR) -p $(@D)
+	$(_V)$(CC) $(ASFLAGS) -MMD -MP -MJ $(patsubst %.o,%.cc.json,$@) -c -o $@ $<
+
+$(BUILDDIR)/%.c.o : %.c | $(OBJS_ASSETS)
+	@echo "  CC      $<"
+	@$(MKDIR) -p $(@D)
+	$(_V)$(CC) $(CFLAGS) -MMD -MP -MJ $(patsubst %.o,%.cc.json,$@) -c -o $@ $<
+
+$(BUILDDIR)/%.bin.o $(BUILDDIR)/%_bin.h : %.bin
+	@echo "  BIN2C   $<"
+	@$(MKDIR) -p $(@D)
+	$(_V)$(WONDERFUL_TOOLCHAIN)/bin/wf-bin2c -a 4 $(@D) $<
+	$(_V)$(CC) $(CFLAGS) -MMD -MP -c -o $(BUILDDIR)/$*.bin.o $(BUILDDIR)/$*_bin.c
+
+# Include dependency files if they exist
+# --------------------------------------
+
+-include $(DEPS)
