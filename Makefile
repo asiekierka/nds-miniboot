@@ -3,7 +3,7 @@
 # SPDX-FileContributor: Adrian "asie" Siekierka, 2024
 
 export WONDERFUL_TOOLCHAIN ?= /opt/wonderful
-export BLOCKSDS ?= /opt/wonderful/thirdparty/blocksds/core
+export BLOCKSDS ?= /opt/blocksds/core
 
 # Tools
 # -----
@@ -43,6 +43,7 @@ all: \
 	$(NDSROM) \
 	$(NDSROM_AK2) \
 	$(NDSROM_R4)
+	$(_V)$(CP) LICENSE README.md dist/
 
 $(NDSROM_R4): $(NDSROM) $(NDSROM_R4_DLDI) $(SCRIPT_R4CRYPT)
 	@$(MKDIR) -p $(@D)

@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    container: skylyrac/blocksds:dev-v1.1.0
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install missing dependencies
+        run: wf-pacman -Sy --noconfirm wf-tools
+
+      - name: Build
+        run: make
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: miniboot archive
+          path: dist
+

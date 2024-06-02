@@ -1,12 +1,28 @@
 # miniboot
 
-Minimal flashcart bootstrap for NDS consoles. Loads `BOOT.NDS` and
+Minimal flashcart bootstrap for NDS consoles. Loads `/BOOT.NDS` and
 papers over various device-specific quirks, allowing running 100%
 clean homebrew launchers on a variety of such devices.
 
+## Usage
+
+### Installation
+
+Copy the contents of the specified directory to the root of your
+flashcart's memory card:
+
+| Device | Directory |
+| ------ | --------- |
+| Acekard 2/2i | generic |
+| R4 (original) | generic |
+
+### Troubleshooting
+
 Hold START while loading to enable debug output.
 
-## Motivation
+## Development
+
+### Motivation
 
 `.nds` files can be loaded essentially anywhere in RAM: in particular,
 3.75MB out of the 4MB of main RAM can be used. As such, the easiest
@@ -24,7 +40,7 @@ simple load/reset code on top of that.
 I've also never created a freestanding NDS homebrew program before, so
 I wanted to see what goes into that.
 
-## Porting
+### Porting
 
 Assorted notes:
 

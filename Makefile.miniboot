@@ -3,7 +3,7 @@
 # SPDX-FileContributor: Adrian "asie" Siekierka, 2024
 
 export WONDERFUL_TOOLCHAIN ?= /opt/wonderful
-export BLOCKSDS ?= /opt/wonderful/thirdparty/blocksds/core
+export BLOCKSDS ?= /opt/blocksds/core
 
 # Configuration
 # -------------
