@@ -30,11 +30,14 @@ endif
 # Build rules
 # -----------
 
-ARM9ELF		:= build/arm9.elf
-ARM7ELF		:= build/arm7.elf
-NDSROM		:= build/miniboot.nds
+ARM9ELF			:= build/arm9.elf
+ARM7ELF			:= build/arm7.elf
+NDSROM			:= build/miniboot.nds
+NDSROM_M3DS_BASE	:= build/miniboot.m3ds.nds
 
 SCRIPT_R4CRYPT		:= scripts/r4crypt.lua
+SCRIPT_DSBIZE		:= scripts/dsbize.lua
+SCRIPT_XORCRYPT		:= scripts/xorcrypt.lua
 
 NDSROM_ACE3DS_DLDI	:= blobs/dldi/acep.dldi
 NDSROM_AK2_DLDI		:= blobs/dldi/ak2.dldi
@@ -44,6 +47,7 @@ NDSROM_DSTT_DLDI	:= blobs/dldi/ttio.dldi
 NDSROM_EZ5_DLDI		:= blobs/dldi/ez5h.dldi
 NDSROM_EZ5N_DLDI	:= blobs/dldi/ez5n.dldi
 NDSROM_GMTF_DLDI	:= blobs/dldi/gmtf.dldi
+NDSROM_M3DS_DLDI	:= blobs/dldi/m3ds.dldi
 NDSROM_MKR6_DLDI	:= blobs/dldi/nmk6.dldi
 NDSROM_R4_DLDI		:= blobs/dldi/r4tf.dldi
 NDSROM_R4DSPRO_DLDI	:= blobs/dldi/ak2_cmd24.dldi
@@ -60,16 +64,22 @@ NDSROM_EZ5		:= dist/generic/ez5sys.bin
 NDSROM_EZ5N		:= dist/generic/ezds.dat
 NDSROM_GMTF		:= dist/generic/bootme.nds
 NDSROM_GWBLUE		:= dist/gwblue/_dsmenu.dat
+NDSROM_ITDS_ENG		:= dist/m3ds/boot.eng
+NDSROM_ITDS_GB		:= dist/m3ds/boot.gb
+NDSROM_ITDS_JP		:= dist/m3ds/boot.jp
+NDSROM_M3DS		:= dist/m3ds/SYSTEM/g6dsload.eng
 NDSROM_MKR6		:= dist/mkr6/_boot_ds.nds
 NDSROM_R4		:= dist/generic/_DS_MENU.DAT
 NDSROM_R4DSPRO	:= dist/r4dspro/_ds_menu.dat
 NDSROM_R4IDSN		:= dist/r4idsn/_dsmenu.dat
 NDSROM_R4ILS		:= dist/ace3dsplus/_dsmenu.dat
+NDSROM_R4IRTSB		:= dist/m3ds/_ds_menu.sys
 NDSROM_R4ISDHC		:= dist/generic/r4.dat
 NDSROM_R4ITT		:= dist/r4itt/_ds_menu.dat
+NDSROM_R4RTS		:= dist/m3ds/loader.eng
 NDSROM_STARGATE		:= dist/stargate/_ds_menu.dat
 
-.PHONY: all clean arm9 arm9plus arm7
+.PHONY: all clean arm9 arm9plus arm9_nobootstub arm7
 
 all: arm9plus \
 	$(NDSROM) \
@@ -83,13 +93,19 @@ all: arm9plus \
 	$(NDSROM_EZ5N) \
 	$(NDSROM_GMTF) \
 	$(NDSROM_GWBLUE) \
+	$(NDSROM_ITDS_ENG) \
+	$(NDSROM_ITDS_GB) \
+	$(NDSROM_ITDS_JP) \
+	$(NDSROM_M3DS) \
 	$(NDSROM_MKR6) \
 	$(NDSROM_R4) \
 	$(NDSROM_R4DSPRO) \
 	$(NDSROM_R4IDSN) \
 	$(NDSROM_R4ILS) \
+	$(NDSROM_R4IRTSB) \
 	$(NDSROM_R4ISDHC) \
 	$(NDSROM_R4ITT) \
+	$(NDSROM_R4RTS) \
 	$(NDSROM_STARGATE)
 	$(_V)$(CP) LICENSE README.md dist/
 
@@ -179,6 +195,53 @@ $(NDSROM_DSONE_SDHC): arm9 arm7 $(NDSROM_DSONE_SDHC_DLDI)
 	@echo "  DLDI    $@"
 	$(_V)$(DLDIPATCH) patch $(NDSROM_DSONE_SDHC_DLDI) $@
 
+$(NDSROM_M3DS_BASE): arm9_nobootstub arm7 $(NDSROM_M3DS_DLDI) $(SCRIPT_DSBIZE)
+	@$(MKDIR) -p $(@D)
+	@echo "  NDSTOOL $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-9 build/arm9_nobootstub.bin -7 build/arm7.bin \
+		-r7 0x23ad800 -e7 0x23ad800 \
+		-r9 0x2380000 -e9 0x2380000 -h 0x200
+	@echo "  DLDI    $@"
+	$(_V)$(DLDIPATCH) patch $(NDSROM_M3DS_DLDI) $@
+	@echo "  DSBIZE  $@"
+	$(_V)$(LUA) $(SCRIPT_DSBIZE) $@
+	@echo "  CRC     $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -fh $@
+
+$(NDSROM_M3DS): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
+	@$(MKDIR) -p $(@D)
+	@echo "  XORCRYP $@"
+	cp $(NDSROM_M3DS_BASE) $@
+	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 12
+	@# M3 firmware checks the existence of this file but does nothing with it.
+	@# The original kernel does check it, but our goal is to replace that.
+	$(_V)touch $(@D)/g6dsload.1
+
+$(NDSROM_ITDS_ENG): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
+	@$(MKDIR) -p $(@D)
+	@echo "  XORCRYP $@"
+	cp $(NDSROM_M3DS_BASE) $@
+	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 32
+
+$(NDSROM_ITDS_GB): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
+	@$(MKDIR) -p $(@D)
+	@echo "  XORCRYP $@"
+	cp $(NDSROM_M3DS_BASE) $@
+	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 33
+
+$(NDSROM_ITDS_JP): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
+	@$(MKDIR) -p $(@D)
+	@echo "  XORCRYP $@"
+	cp $(NDSROM_M3DS_BASE) $@
+	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 37
+
+$(NDSROM_R4IRTSB) $(NDSROM_R4RTS): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
+	@$(MKDIR) -p $(@D)
+	@echo "  XORCRYP $@"
+	cp $(NDSROM_M3DS_BASE) $@
+	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 72
+
 $(NDSROM_R4ISDHC): arm9_r4isdhc arm7 $(NDSROM_DSTT_DLDI)
 	@$(MKDIR) -p $(@D)
 	@echo "  NDSTOOL $@"
@@ -250,13 +313,16 @@ $(NDSROM): arm9 arm7
 
 clean:
 	@echo "  CLEAN"
-	$(_V)$(RM) build dist	
+	$(_V)$(RM) build dist
 
 arm9:
 	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm9 --no-print-directory
 
 arm9plus:
 	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm9plus --no-print-directory
+
+arm9_nobootstub:
+	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm9_nobootstub --no-print-directory
 
 arm9_r4isdhc: arm9
 	@echo "  R4ISDHC"

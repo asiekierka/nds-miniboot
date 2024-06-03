@@ -11,28 +11,32 @@ clean homebrew launchers on a variety of such devices.
 Copy the contents of the specified directory to the root of your
 flashcart's memory card:
 
-| Device | Directory |
-| ------ | --------- |
-| Ace3DS+ / Ace3DS X | ace3dsplus |
-| Acekard 2/2i | generic |
-| Datel Games 'n' Music | generic |
-| DSTT | generic |
-| EDGEi | generic |
-| EZ-Flash Parallel | generic |
-| EZ-Flash V | generic |
-| Gateway Blue | gwblue |
-| R4 (original) | generic |
-| R4 i.L.S. | ace3dsplus |
-| R4/R4i Ultra | r4itt |
-| R4iDSN | r4idsn |
-| R4iTT 3DS | r4itt |
-| r4dspro.com | r4dspro |
-| r4ids.cn | r4itt |
-| R6 Gold/Silver | mkr6 |
-| Stargate 3DS | stargate |
-| SuperCard DSONE | generic |
-| SuperCard DSONE SDHC | dsonesdhc |
-| Timebomb carts | generic |
+| Device | Directory | Notes |
+| ------ | --------- | |
+| Ace3DS+ / Ace3DS X | ace3dsplus | |
+| Acekard 2/2i | generic | |
+| Datel Games 'n' Music | generic | |
+| DSTT | generic | |
+| EDGEi | generic | |
+| EZ-Flash Parallel | generic | |
+| EZ-Flash V | generic | |
+| Gateway Blue | gwblue | |
+| iTouchDS | m3ds | No bootstub support |
+| M3 DS Real | m3ds | No bootstub support |
+| R4 (original) | generic | |
+| R4 i.L.S. | ace3dsplus | |
+| R4/R4i Ultra | r4itt | |
+| R4iDSN | r4idsn | |
+| R4iSDHC RTS (black) (r4isdhc.com) | m3ds | No bootstub support |
+| R4iTT 3DS | r4itt | |
+| R4/R4i RTS (r4rts.com) | m3ds | No bootstub support |
+| r4dspro.com | r4dspro | |
+| r4ids.cn | r4itt | |
+| R6 Gold/Silver | mkr6 | |
+| Stargate 3DS | stargate | |
+| SuperCard DSONE | generic | |
+| SuperCard DSONE SDHC | dsonesdhc | |
+| Various timebomb carts | generic | |
 
 ### Troubleshooting
 
