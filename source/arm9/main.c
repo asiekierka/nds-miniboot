@@ -90,6 +90,7 @@ int main(void) {
     }
     dprintf(" OK\n");
 
+#ifndef _NO_BOOTSTUB
     // Create a bootstub in memory, if one doesn't already exist.
     if (DKA_BOOTSTUB->magic != DKA_BOOTSTUB_MAGIC) {
         uint8_t *bootstub_loc = ((uint8_t*) DKA_BOOTSTUB) + sizeof(dka_bootstub_t);
@@ -108,6 +109,7 @@ int main(void) {
         DKA_BOOTSTUB->arm7_entry = bootstub_loc + 4;
         DKA_BOOTSTUB->loader_size = 0;
     }
+#endif // _NO_BOOTSTUB
 
     // Create a copy of the DLDI driver in VRAM before initializing it.
     // We'll make use of this copy for patching the ARM9 binary later.
