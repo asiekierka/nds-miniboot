@@ -37,6 +37,8 @@ size_t strlen(const char * s); // used by nanoprintf
 
 /* === register defines === */
 
+#define REG_POWCNT             (*((volatile uint16_t*) 0x4000304))
+
 #if defined(ARM9)
 #define MEM_PALETTE_BG         ((uint16_t*) 0x5000000)
 #define DISPCNT_BG_MODE(n)     (n)
@@ -53,6 +55,12 @@ size_t strlen(const char * s); // used by nanoprintf
 #define VRAMCNT_ABCD(a,b,c,d)  ((a) | ((b)<<8) | ((c)<<16) | ((d)<<24))
 #define REG_VRAMCNT_ABCD       (*((volatile uint32_t*) 0x4000240))
 
+#define VRAMCNT_EFGW(e,f,g,w)  ((e) | ((f)<<8) | ((g)<<16) | ((w)<<24))
+#define REG_VRAMCNT_EFGW       (*((volatile uint32_t*) 0x4000244))
+
+#define VRAMCNT_HI(h,i)        ((h) | ((i)<<8))
+#define REG_VRAMCNT_HI         (*((volatile uint16_t*) 0x4000248))
+
 #define KEY_A                  0x001
 #define KEY_B                  0x002
 #define KEY_SELECT             0x004
@@ -66,8 +74,14 @@ size_t strlen(const char * s); // used by nanoprintf
 #define REG_KEYINPUT           (*((volatile uint16_t*) 0x4000130))
 
 #define REG_EXMEMCNT           (*((volatile uint16_t*) 0x4000204))
+
+#define POWCNT_LCD             0x0001
+#define POWCNT_2D_MAIN         0x0002
+#define POWCNT_3D              0x0004
+#define POWCNT_3D_GEOMETRY     0x0008
+#define POWCNT_2D_SUB          0x0200
+#define POWCNT_DISPLAY_SWAP    0x8000
 #elif defined(ARM7)
-// Nothing! The ARM7 stub is written entirely in ASM.
 #else
 #error "No CPU defined!"
 #endif

@@ -14,11 +14,13 @@ flashcart's memory card:
 | Device | Directory |
 | ------ | --------- |
 | Acekard 2/2i | generic |
+| Gateway Blue | gwblue |
 | R4 (original) | generic |
 
 ### Troubleshooting
 
-Hold START while loading to enable debug output.
+Hold START while loading to enable debug output. Note that launching
+will only continue once you release START.
 
 ## Development
 

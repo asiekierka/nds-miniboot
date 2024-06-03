@@ -60,16 +60,17 @@ int main(void) {
 
     WAIT_ARM7_ACK();
 
+    REG_POWCNT = POWCNT_LCD | POWCNT_2D_MAIN | POWCNT_DISPLAY_SWAP;
+    // Ensure ARM9 has control over the cartridge slots.
+    REG_EXMEMCNT = 0x6000; // ARM9 memory priority, ARM9 slot access, "slow" GBA timings
+
     // Reset display.
     displayReset();
 
-    // Initialize VRAM (128KB to main engine, 384KB to CPU).
-    REG_VRAMCNT_ABCD = VRAMCNT_ABCD(0x81, 0x80, 0x80, 0x80);
-
-    // Ensure ARM9 has control over the cartridge slots.
-    // Restoring this variable to its previous state is required!
-    uint16_t old_exmemcnt = REG_EXMEMCNT;
-    REG_EXMEMCNT = 0x6000; // ARM9 memory priority, ARM9 slot access, "slow" GBA timings
+    // Initialize VRAM (128KB to main engine, rest to CPU, 32KB WRAM to ARM7).
+    REG_VRAMCNT_ABCD = VRAMCNT_ABCD(0x81, 0x80, 0x82, 0x8A);
+    REG_VRAMCNT_EFGW = VRAMCNT_EFGW(0x80, 0x80, 0x80, 0x03);
+    REG_VRAMCNT_HI = VRAMCNT_HI(0x80, 0x80);
 
     // If holding START while booting, or DEBUG is defined, enable 
     // debug output.
@@ -150,9 +151,12 @@ int main(void) {
 
     dprintf("Launching");
 
+    // If debug enabled, wait for user to stop holding START
+    if (debugEnabled) while (!(REG_KEYINPUT & KEY_START));
+
     // Restore/clear system state.
     displayReset();
-    REG_EXMEMCNT = old_exmemcnt;
+    REG_EXMEMCNT = 0xE880;
 
     // Start the ARM7 binary.
     arm7_comms_port = 0x80000000;

@@ -12,17 +12,26 @@ _start:
     mov r11, #0
     // Disable IRQs.
     ldr r3, =0x4000000
-    str r11, [r3, #0x208]
+    str r11, [r3, #0x208] // IME
+    str r11, [r3, #0x210] // IE
+    mvn r10, r11
+    str r10, [r3, #0x214] // IF
     // Disable DMA.
-    str r11, [r3, #0x0B8]
-    str r11, [r3, #0x0C4]
-    str r11, [r3, #0x0D0]
-    str r11, [r3, #0x0DC]
+    add r4, r3, #0xB0
+    mov r5, #0x30
+_dma_clear:
+    subs r5, r5, #4
+    strge r11, [r4], #4
+    bgt _dma_clear
     // Disable timers.
     str r11, [r3, #0x100]
     str r11, [r3, #0x104]
     str r11, [r3, #0x108]
     str r11, [r3, #0x10C]
+    // Clear/deinitialize FIFO.
+    str r11, [r3, #0x180] // IPCSYNC
+    ldr r0, =0x4008 // Disable, acknowledge error, flush
+    str r0, [r3, #0x184] // IPCFIFOCNT
 
     // Copy up to 96 bytes to the stack area.
     adr r0, _stage2

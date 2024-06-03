@@ -31,19 +31,38 @@ endif
 ARM9ELF		:= build/arm9.elf
 ARM7ELF		:= build/arm7.elf
 NDSROM		:= build/miniboot.nds
-NDSROM_AK2	:= dist/generic/akmenu4.nds
-NDSROM_AK2_DLDI := blobs/dldi/ak2_sd.dldi
-NDSROM_R4	:= dist/generic/_DS_MENU.DAT
-NDSROM_R4_DLDI  := blobs/dldi/r4tfv3.dldi
-SCRIPT_R4CRYPT	:= scripts/r4crypt.lua
+
+SCRIPT_R4CRYPT		:= scripts/r4crypt.lua
+
+NDSROM_ACE3DS_DLDI	:= blobs/dldi/ace3ds_sd.dldi
+NDSROM_AK2_DLDI		:= blobs/dldi/ak2_sd.dldi
+NDSROM_R4_DLDI		:= blobs/dldi/r4tfv3.dldi
+
+NDSROM_AK2		:= dist/generic/akmenu4.nds
+NDSROM_GWBLUE		:= dist/gwblue/_dsmenu.dat
+NDSROM_R4		:= dist/generic/_DS_MENU.DAT
 
 .PHONY: all clean arm9 arm7
 
 all: \
 	$(NDSROM) \
 	$(NDSROM_AK2) \
+	$(NDSROM_GWBLUE) \
 	$(NDSROM_R4)
 	$(_V)$(CP) LICENSE README.md dist/
+
+$(NDSROM_GWBLUE): arm9 arm7 $(NDSROM_ACE3DS_DLDI) $(SCRIPT_R4CRYPT)
+	@$(MKDIR) -p $(@D)
+	@echo "  NDSTOOL $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-9 build/arm9.bin -7 build/arm7.bin \
+		-r7 0x2380000 -e7 0x2380000 \
+		-r9 0x2000450 -e9 0x2000450 -h 0x200 \
+		-g "####" "##" "R4IT"
+	@echo "  DLDI    $@"
+	$(_V)$(DLDIPATCH) patch $(NDSROM_ACE3DS_DLDI) $@
+	@echo "  R4CRYPT $@"
+	$(_V)$(LUA) $(SCRIPT_R4CRYPT) $@ 4002
 
 $(NDSROM_R4): $(NDSROM) $(NDSROM_R4_DLDI) $(SCRIPT_R4CRYPT)
 	@$(MKDIR) -p $(@D)
@@ -60,6 +79,7 @@ $(NDSROM_AK2): $(NDSROM) $(NDSROM_AK2_DLDI)
 	$(_V)$(DLDIPATCH) patch $(NDSROM_AK2_DLDI) $@
 
 $(NDSROM): arm9 arm7
+	@$(MKDIR) -p $(@D)
 	@echo "  NDSTOOL $@"
 	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
 		-9 build/arm9.bin -7 build/arm7.bin \
