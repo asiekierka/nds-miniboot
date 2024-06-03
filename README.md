@@ -15,6 +15,7 @@ flashcart's memory card:
 | ------ | --------- |
 | Ace3DS+ / Ace3DS X | ace3dsplus |
 | Acekard 2/2i | generic |
+| EZ-Flash V | generic |
 | Gateway Blue | gwblue |
 | R4 (original) | generic |
 | R4 i.L.S. | ace3dsplus |
