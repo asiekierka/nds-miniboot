@@ -38,7 +38,7 @@ newLine:
         if ((++fontY) > FONT_Y_MAX) {
             --fontY;
             __aeabi_memmove4(DISPLAY_MAP + (FONT_Y_MIN * 32), DISPLAY_MAP + ((FONT_Y_MIN + 1) * 32), (FONT_Y_MAX - FONT_Y_MIN) * 64);
-            memset(DISPLAY_MAP + (fontY * 32) + FONT_X_MIN, 0, (FONT_X_MAX - FONT_X_MIN + 1) * 2);
+            __aeabi_memset(DISPLAY_MAP + (fontY * 32) + FONT_X_MIN, (FONT_X_MAX - FONT_X_MIN + 1) * 2, 0);
         }
     }
 }
@@ -58,7 +58,7 @@ int eprintf(const char *format, ...) {
 void displayReset(void) {
     // Clear display registers, force blanking.
     REG_DISPCNT = DISPCNT_FORCE_DISABLE;
-    __ndsabi_wordset4((void*) 0x4000004, 0, 0x58 - 4);
+    __ndsabi_wordset4((void*) 0x4000004, 0x58 - 4, 0);
 }
 
 void consoleInit(void) {
@@ -70,8 +70,8 @@ void consoleInit(void) {
     MEM_PALETTE_BG[1 + (1 << 4)] = RGB555(16, 16, 16);
 
     // Clear background map, tile 0.
-    __ndsabi_wordset4(DISPLAY_TILES, 0, 32);
-    __ndsabi_wordset4(DISPLAY_MAP, 0, 2048);
+    __ndsabi_wordset4(DISPLAY_TILES, 32, 0);
+    __ndsabi_wordset4(DISPLAY_MAP, 2048, 0);
 
     // Unpack font tiles.
     uint32_t unpackParams[2] = {760 | (1 << 16) | (4 << 24), 0};

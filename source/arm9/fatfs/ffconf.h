@@ -381,3 +381,8 @@
 */
 
 /*--- End of configuration options ---*/
+
+// FatFs does not use memcpy's return value, so we can use __aeabi_memcpy
+// instead.
+#include "aeabi.h"
+#define memcpy __aeabi_memcpy

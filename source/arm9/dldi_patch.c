@@ -5,6 +5,7 @@
 // Copyright (c) 2024 Adrian "asie" Siekierka
 
 #include "dldi_patch.h"
+#include "aeabi.h"
 #include "console.h"
 
 static void dldi_relocate(DLDI_INTERFACE *io) {
@@ -62,7 +63,7 @@ static void dldi_relocate(DLDI_INTERFACE *io) {
 
     // Initialise the BSS to 0
     if (io->fixSectionsFlags & FIX_BSS) {
-        memset(io->bssStart, 0, (uint8_t*) io->bssEnd - (uint8_t*) io->bssStart);
+        __aeabi_memset(io->bssStart, (uint8_t*) io->bssEnd - (uint8_t*) io->bssStart, 0);
     }
 }
 
