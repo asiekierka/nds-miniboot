@@ -63,9 +63,6 @@ __aeabi_memset4:
 __ndsabi_wordset4:
     mov     r3, r2
 
-    .global __ndsabi_lwordset4
-    .type __ndsabi_lwordset4, %function
-__ndsabi_lwordset4:
     @ 16 words is roughly the threshold when lwordset is slower
     cmp     r1, #64
     blt     .Lset_2_words

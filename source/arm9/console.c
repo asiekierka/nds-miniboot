@@ -58,7 +58,7 @@ int eprintf(const char *format, ...) {
 void displayReset(void) {
     // Clear display registers, force blanking.
     REG_DISPCNT = DISPCNT_FORCE_DISABLE;
-    __ndsabi_lwordset4((void*) 0x4000004, 0, 0x58 - 4);
+    __ndsabi_wordset4((void*) 0x4000004, 0, 0x58 - 4);
 }
 
 void consoleInit(void) {

@@ -49,16 +49,6 @@ void __ndsabi_rmemcpy(void* __restrict__ dest, const void* __restrict__ src, siz
 /**
  * Fills dest with n bytes of c
  * Assumes dest is 4-byte aligned
- * Trailing copy uses the low word of c, and the low byte of c
- * @param dest Destination address
- * @param n Number of bytes to set
- * @param c Value to set
- */
-void __ndsabi_lwordset4(void* dest, size_t n, long long c) __attribute__((nonnull(1)));
-
-/**
- * Fills dest with n bytes of c
- * Assumes dest is 4-byte aligned
  * Trailing copy uses the low byte of c
  * @param dest Destination address
  * @param n Number of bytes to set
