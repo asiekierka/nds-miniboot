@@ -19,6 +19,7 @@ flashcart's memory card:
 | R4 (original) | generic |
 | R4 i.L.S. | ace3dsplus |
 | R4iDSN | r4idsn |
+| SuperCard DSONE | generic |
 
 ### Troubleshooting
 
