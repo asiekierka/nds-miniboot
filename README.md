@@ -18,6 +18,7 @@ flashcart's memory card:
 | Gateway Blue | gwblue |
 | R4 (original) | generic |
 | R4 i.L.S. | ace3dsplus |
+| R4iDSN | r4idsn |
 
 ### Troubleshooting
 
