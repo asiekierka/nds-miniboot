@@ -24,6 +24,13 @@ will only continue once you release START.
 
 ## Development
 
+To build miniboot, the [Wonderful toolchain](https://wonderful.asie.pl/)'s
+`wf-tools`, `toolchain-gcc-arm-none-eabi`, as well as BlocksDS (for
+`ndstool` and `dldipatch`) are required. They can be installed with the
+following command:
+
+    $ wf-pacman -Sy toolchain-gcc-arm-none-eabi thirdparty-blocksds wf-tools
+
 ### Motivation
 
 `.nds` files can be loaded essentially anywhere in RAM: in particular,
