@@ -10,8 +10,6 @@ MEMORY {
 }
 
 SECTIONS {
-	arm7_comms_port = 0x27fff70;
-
 	.text : ALIGN(4) {
 		*(.start)
 		*(.text .text.* .gnu.linkonce.t.*)

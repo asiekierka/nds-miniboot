@@ -12,8 +12,6 @@ MEMORY {
 }
 
 SECTIONS {
-	arm7_comms_port = 0x27fff70;
-
 	/* === Constants === */
 	PROVIDE(__dldi_size = 16384);
 	__dldi_log2_size = LOG2CEIL(__dldi_size + 1) - 1;

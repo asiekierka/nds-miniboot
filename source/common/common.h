@@ -37,6 +37,13 @@ size_t strlen(const char * s); // used by nanoprintf
 
 /* === register defines === */
 
+#define IPCSYNC_INPUT(n)       (n)
+#define IPCSYNC_OUTPUT(n)      ((n) << 8)
+
+#define REG_IPCSYNC            (*((volatile uint32_t*) 0x4000180))
+#define REG_IPCFIFOCNT         (*((volatile uint32_t*) 0x4000184))
+#define REG_IPCFIFOSEND        (*((volatile uint32_t*) 0x4000188))
+#define REG_IPCFIFORECV        (*((volatile uint32_t*) 0x4100000))
 #define REG_POWCNT             (*((volatile uint16_t*) 0x4000304))
 
 #if defined(ARM9)

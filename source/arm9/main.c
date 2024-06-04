@@ -12,16 +12,6 @@
 
 static FATFS fs;
 
-/**
- * @brief ARM7 communication port.
- *
- * We only need ARM9->ARM7 communication and acknowledgement,
- * so relying on a single memory value is fine. IPC FIFO might be better,
- * though...
- */
-extern volatile uint32_t arm7_comms_port;
-#define WAIT_ARM7_ACK() while (arm7_comms_port)
-
 #define DLDI_BACKUP   ((DLDI_INTERFACE*) 0x6820000)
 
 /* === Error reporting === */
@@ -50,15 +40,27 @@ void checkErrorFatFs(const char *msg, int result) {
 
 /* === Main logic === */
 
-__attribute__((noreturn))
-extern void finish(void);
+#define IPC_ARM7_NONE  0x000
+#define IPC_ARM7_COPY  0x100
+#define IPC_ARM7_RESET 0x200
+#define IPC_ARM7_SYNC  0xF00
+
+void ipc_arm7_cmd(uint32_t cmd) {
+    uint32_t next_sync = REG_IPCSYNC & 0xF;
+    uint32_t last_sync = next_sync;
+    REG_IPCSYNC = cmd;
+    while (last_sync == next_sync) next_sync = REG_IPCSYNC & 0xF;
+}
 
 int main(void) {
     FIL fp;
     unsigned int bytes_read;
     int result;
 
-    WAIT_ARM7_ACK();
+    // Initialize VRAM (128KB to main engine, rest to CPU, 32KB WRAM to ARM7).
+    REG_VRAMCNT_ABCD = VRAMCNT_ABCD(0x81, 0x80, 0x82, 0x8A);
+    REG_VRAMCNT_EFGW = VRAMCNT_EFGW(0x80, 0x80, 0x80, 0x03);
+    REG_VRAMCNT_HI = VRAMCNT_HI(0x80, 0x80);
 
     REG_POWCNT = POWCNT_LCD | POWCNT_2D_MAIN | POWCNT_DISPLAY_SWAP;
     // Ensure ARM9 has control over the cartridge slots.
@@ -66,11 +68,6 @@ int main(void) {
 
     // Reset display.
     displayReset();
-
-    // Initialize VRAM (128KB to main engine, rest to CPU, 32KB WRAM to ARM7).
-    REG_VRAMCNT_ABCD = VRAMCNT_ABCD(0x81, 0x80, 0x82, 0x8A);
-    REG_VRAMCNT_EFGW = VRAMCNT_EFGW(0x80, 0x80, 0x80, 0x03);
-    REG_VRAMCNT_HI = VRAMCNT_HI(0x80, 0x80);
 
     // If holding START while booting, or DEBUG is defined, enable 
     // debug output.
@@ -81,6 +78,13 @@ int main(void) {
     debugEnabled = !(REG_KEYINPUT & KEY_START);
 #endif
 #endif
+
+    dprintf("ARM7 sync");
+    for (int i = 1; i <= 16; i++) {
+        dprintf(".");
+        ipc_arm7_cmd((i << 8) & 0xF00);
+    }
+    dprintf(" OK\n");
 
     // Create a copy of the DLDI driver in VRAM before initializing it.
     // We'll make use of this copy for patching the ARM9 binary later.
@@ -96,6 +100,7 @@ int main(void) {
     // Read the .nds file header.
     checkErrorFatFs("Could not read BOOT.NDS", f_read(&fp, NDS_HEADER, sizeof(nds_header_t), &bytes_read));
 
+    bool waiting_arm7 = false;
     // Load the ARM7 binary.
     {
         dprintf("ARM7: %d bytes @ %X\n", NDS_HEADER->arm7_size, NDS_HEADER->arm7_start);
@@ -115,10 +120,11 @@ int main(void) {
         // If the ARM7 binary has to be relocated to ARM7 RAM, the ARM7 CPU
         // has to relocate it from main memory.
         if (in_arm7_ram) {
-            arm7_comms_port = NDS_HEADER->arm7_size;
-            WAIT_ARM7_ACK();
-            arm7_comms_port = NDS_HEADER->arm7_start;
-            // No WAIT_ARM7_ACK here - allow it to copy asynchronously.
+            REG_IPCFIFOSEND = NDS_HEADER->arm7_size;
+            REG_IPCFIFOSEND = 0x2000000;
+            REG_IPCFIFOSEND = NDS_HEADER->arm7_start;
+            ipc_arm7_cmd(IPC_ARM7_COPY);
+            waiting_arm7 = true;
         }
     }
 
@@ -134,8 +140,10 @@ int main(void) {
         }
 
         checkErrorFatFs("Could not read BOOT.NDS", f_lseek(&fp, NDS_HEADER->arm9_offset));
-        // Finish copying ARM7 binary, if necessary, before writing more data to main RAM.
-        WAIT_ARM7_ACK();
+        if (waiting_arm7) {
+            ipc_arm7_cmd(IPC_ARM7_NONE);
+            waiting_arm7 = false;
+        }
         checkErrorFatFs("Could not read BOOT.NDS", f_read(&fp, (void*) NDS_HEADER->arm9_start, NDS_HEADER->arm9_size, &bytes_read));
 
         // Try to apply the DLDI driver patch.
@@ -159,8 +167,7 @@ int main(void) {
     REG_EXMEMCNT = 0xE880;
 
     // Start the ARM7 binary.
-    arm7_comms_port = 0x80000000;
-    while (arm7_comms_port);
+    ipc_arm7_cmd(IPC_ARM7_RESET);
 
     // Start the ARM9 binary.
     swiSoftReset();

@@ -51,6 +51,10 @@ _dma_clear:
     str r11, [r3, #0x104]
     str r11, [r3, #0x108]
     str r11, [r3, #0x10C]
+    // Clear/initialize FIFO.
+    str r11, [r3, #0x180] // IPCSYNC
+    ldr r4, =0xC008 // Enable, acknowledge error, flush
+    str r4, [r3, #0x184] // IPCFIFOCNT
 
     // Initialize ITCM.
     mov r3, #(CP15_TCM_SIZE_32MB << 1)
