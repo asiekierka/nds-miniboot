@@ -17,6 +17,7 @@ flashcart's memory card:
 | Acekard 2/2i | generic |
 | Datel Games 'n' Music | generic |
 | EDGEi | generic |
+| EZ-Flash Parallel | generic |
 | EZ-Flash V | generic |
 | Gateway Blue | gwblue |
 | R4 (original) | generic |

@@ -38,6 +38,7 @@ NDSROM_ACE3DS_DLDI	:= blobs/dldi/ace3ds_sd.dldi
 NDSROM_AK2_DLDI		:= blobs/dldi/ak2_sd.dldi
 NDSROM_DSONE_DLDI	:= blobs/dldi/scds3.dldi
 NDSROM_EZ5_DLDI		:= blobs/dldi/ez5h.dldi
+NDSROM_EZ5N_DLDI	:= blobs/dldi/ez5n.dldi
 NDSROM_GMTF_DLDI	:= blobs/dldi/gmtf.dldi
 NDSROM_R4_DLDI		:= blobs/dldi/r4tfv3.dldi
 NDSROM_R4DSPRO_DLDI	:= blobs/dldi/ak2_sd_singlewrite.dldi
@@ -49,6 +50,7 @@ NDSROM_AK2		:= dist/generic/akmenu4.nds
 NDSROM_DSONE	:= dist/generic/scfw.sc
 NDSROM_EDGEI	:= dist/generic/dsedgei.dat
 NDSROM_EZ5		:= dist/generic/ez5sys.bin
+NDSROM_EZ5N		:= dist/generic/ezds.dat
 NDSROM_GMTF		:= dist/generic/bootme.nds
 NDSROM_GWBLUE		:= dist/gwblue/_dsmenu.dat
 NDSROM_R4		:= dist/generic/_DS_MENU.DAT
@@ -67,6 +69,7 @@ all: \
 	$(NDSROM_DSONE) \
 	$(NDSROM_EDGEI) \
 	$(NDSROM_EZ5) \
+	$(NDSROM_EZ5N) \
 	$(NDSROM_GMTF) \
 	$(NDSROM_GWBLUE) \
 	$(NDSROM_R4) \
@@ -161,6 +164,13 @@ $(NDSROM_EZ5): $(NDSROM) $(NDSROM_EZ5_DLDI)
 	@echo "  DLDI    $@"
 	$(_V)$(CP) $(NDSROM) $@
 	$(_V)$(DLDIPATCH) patch $(NDSROM_EZ5_DLDI) $@
+
+$(NDSROM_EZ5N): $(NDSROM) $(NDSROM_EZ5N_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  DLDI    $@"
+	$(_V)$(CP) $(NDSROM) $@
+	$(_V)$(DLDIPATCH) patch $(NDSROM_EZ5N_DLDI) $@
+	$(_V)sed -i "s|\xED\xA5\x8D\xBF|\x00\x00\x00\x00|g" $@
 
 $(NDSROM_GMTF): $(NDSROM) $(NDSROM_GMTF_DLDI)
 	@$(MKDIR) -p $(@D)
