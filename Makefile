@@ -45,6 +45,7 @@ NDSROM_R4IDSN_DLDI	:= blobs/dldi/r4idsn_sd.dldi
 NDSROM_ACE3DS		:= dist/ace3dsplus/_ds_menu.dat
 NDSROM_AK2		:= dist/generic/akmenu4.nds
 NDSROM_DSONE	:= dist/generic/scfw.sc
+NDSROM_EDGEI	:= dist/generic/dsedgei.dat
 NDSROM_EZ5		:= dist/generic/ez5sys.bin
 NDSROM_GMTF		:= dist/generic/bootme.nds
 NDSROM_GWBLUE		:= dist/gwblue/_dsmenu.dat
@@ -60,6 +61,7 @@ all: \
 	$(NDSROM_ACE3DS) \
 	$(NDSROM_AK2) \
 	$(NDSROM_DSONE) \
+	$(NDSROM_EDGEI) \
 	$(NDSROM_EZ5) \
 	$(NDSROM_GMTF) \
 	$(NDSROM_GWBLUE) \
@@ -142,7 +144,7 @@ $(NDSROM_R4): $(NDSROM) $(NDSROM_R4_DLDI) $(SCRIPT_R4CRYPT)
 	@echo "  R4CRYPT $@"
 	$(_V)$(LUA) $(SCRIPT_R4CRYPT) $@
 
-$(NDSROM_AK2): $(NDSROM) $(NDSROM_AK2_DLDI)
+$(NDSROM_AK2) $(NDSROM_EDGEI): $(NDSROM) $(NDSROM_AK2_DLDI)
 	@$(MKDIR) -p $(@D)
 	@echo "  DLDI    $@"
 	$(_V)$(CP) $(NDSROM) $@
