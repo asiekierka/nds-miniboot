@@ -5,6 +5,7 @@
 #include "common.h"
 #include "bios.h"
 #include "dka.h"
+#include "bootstub.h"
 #include "dldi_patch.h"
 #include "ff.h"
 #include "console.h"
@@ -89,6 +90,25 @@ int main(void) {
     }
     dprintf(" OK\n");
 
+    // Create a bootstub in memory, if one doesn't already exist.
+    if (DKA_BOOTSTUB->magic != DKA_BOOTSTUB_MAGIC) {
+        uint8_t *bootstub_loc = ((uint8_t*) DKA_BOOTSTUB) + sizeof(dka_bootstub_t);
+        uint8_t *arm9_bin_loc = bootstub_loc + bootstub_size;
+        uint8_t *arm7_bin_loc = arm9_bin_loc + NDS_HEADER->arm9_size;
+        
+        bootstub.arm9_target_entry = arm9_bin_loc;
+        bootstub.arm7_target_entry = arm7_bin_loc;
+
+        __aeabi_memcpy(bootstub_loc, &bootstub, bootstub_size);
+        __aeabi_memcpy(arm9_bin_loc, (void*) NDS_HEADER->arm9_start, NDS_HEADER->arm9_size);
+        __aeabi_memcpy(arm7_bin_loc, (void*) NDS_HEADER->arm7_start, NDS_HEADER->arm7_size);
+
+        DKA_BOOTSTUB->magic = DKA_BOOTSTUB_MAGIC;
+        DKA_BOOTSTUB->arm9_entry = bootstub_loc;
+        DKA_BOOTSTUB->arm7_entry = bootstub_loc + 4;
+        DKA_BOOTSTUB->loader_size = 0;
+    }
+
     // Create a copy of the DLDI driver in VRAM before initializing it.
     // We'll make use of this copy for patching the ARM9 binary later.
     __aeabi_memcpy4(DLDI_BACKUP, &_io_dldi_stub, 16384);
@@ -164,7 +184,7 @@ int main(void) {
     DKA_ARGV->cmdline = (char*) 0x2FFFEB0;
     DKA_ARGV->cmdline_size = strlen(executable_path) + 1;
     __aeabi_memcpy(DKA_ARGV->cmdline, executable_path, DKA_ARGV->cmdline_size);
-    DKA_ARGV->magic = ARGV_MAGIC;
+    DKA_ARGV->magic = DKA_ARGV_MAGIC;
 
     dprintf("Launching");
 
