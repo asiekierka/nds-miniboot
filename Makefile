@@ -36,20 +36,40 @@ SCRIPT_R4CRYPT		:= scripts/r4crypt.lua
 
 NDSROM_ACE3DS_DLDI	:= blobs/dldi/ace3ds_sd.dldi
 NDSROM_AK2_DLDI		:= blobs/dldi/ak2_sd.dldi
+NDSROM_DSONE_DLDI	:= blobs/dldi/scds3.dldi
 NDSROM_R4_DLDI		:= blobs/dldi/r4tfv3.dldi
+NDSROM_R4IDSN_DLDI	:= blobs/dldi/r4idsn_sd.dldi
 
+NDSROM_ACE3DS		:= dist/ace3dsplus/_ds_menu.dat
 NDSROM_AK2		:= dist/generic/akmenu4.nds
+NDSROM_DSONE	:= dist/generic/scfw.sc
 NDSROM_GWBLUE		:= dist/gwblue/_dsmenu.dat
 NDSROM_R4		:= dist/generic/_DS_MENU.DAT
+NDSROM_R4IDSN		:= dist/r4idsn/_dsmenu.dat
+NDSROM_R4ILS		:= dist/ace3dsplus/_dsmenu.dat
+NDSROM_R4ITT		:= dist/r4itt/_ds_menu.dat
 
 .PHONY: all clean arm9 arm7
 
 all: \
 	$(NDSROM) \
+	$(NDSROM_ACE3DS) \
 	$(NDSROM_AK2) \
+	$(NDSROM_DSONE) \
 	$(NDSROM_GWBLUE) \
-	$(NDSROM_R4)
+	$(NDSROM_R4) \
+	$(NDSROM_R4IDSN) \
+	$(NDSROM_R4ILS) \
+	$(NDSROM_R4ITT)
 	$(_V)$(CP) LICENSE README.md dist/
+
+$(NDSROM_ACE3DS): $(NDSROM) $(NDSROM_ACE3DS_DLDI) $(SCRIPT_R4CRYPT)
+	@$(MKDIR) -p $(@D)
+	@echo "  DLDI    $@"
+	$(_V)$(CP) $(NDSROM) $@
+	$(_V)$(DLDIPATCH) patch $(NDSROM_ACE3DS_DLDI) $@
+	@echo "  R4CRYPT $@"
+	$(_V)$(LUA) $(SCRIPT_R4CRYPT) $@ 4002
 
 $(NDSROM_GWBLUE): arm9 arm7 $(NDSROM_ACE3DS_DLDI) $(SCRIPT_R4CRYPT)
 	@$(MKDIR) -p $(@D)
@@ -63,6 +83,50 @@ $(NDSROM_GWBLUE): arm9 arm7 $(NDSROM_ACE3DS_DLDI) $(SCRIPT_R4CRYPT)
 	$(_V)$(DLDIPATCH) patch $(NDSROM_ACE3DS_DLDI) $@
 	@echo "  R4CRYPT $@"
 	$(_V)$(LUA) $(SCRIPT_R4CRYPT) $@ 4002
+
+$(NDSROM_R4ILS): arm9 arm7 $(NDSROM_ACE3DS_DLDI) $(SCRIPT_R4CRYPT)
+	@$(MKDIR) -p $(@D)
+	@echo "  NDSTOOL $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-9 build/arm9.bin -7 build/arm7.bin \
+		-r7 0x2380000 -e7 0x2380000 \
+		-r9 0x2000450 -e9 0x2000450 -h 0x200 \
+		-g "####" "##" "R4XX"
+	@echo "  DLDI    $@"
+	$(_V)$(DLDIPATCH) patch $(NDSROM_ACE3DS_DLDI) $@
+	@echo "  R4CRYPT $@"
+	$(_V)$(LUA) $(SCRIPT_R4CRYPT) $@ 4002
+
+$(NDSROM_R4IDSN): arm9 arm7 $(NDSROM_R4IDSN_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  NDSTOOL $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-9 build/arm9.bin -7 build/arm7.bin \
+		-r7 0x2380000 -e7 0x2380000 \
+		-r9 0x2000000 -e9 0x2000000 -h 0x200
+	@echo "  DLDI    $@"
+	$(_V)$(DLDIPATCH) patch $(NDSROM_R4IDSN_DLDI) $@
+
+$(NDSROM_R4ITT): arm9 arm7 $(NDSROM_AK2_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  NDSTOOL $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-9 build/arm9.bin -7 build/arm7.bin \
+		-r7 0x2380000 -e7 0x2380000 \
+		-r9 0x2000800 -e9 0x2000800 -h 0x200
+	@echo "  DLDI    $@"
+	$(_V)$(DLDIPATCH) patch $(NDSROM_AK2_DLDI) $@
+
+$(NDSROM_DSONE): arm9 arm7 $(NDSROM_DSONE_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  NDSTOOL $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-9 build/arm9.bin -7 build/arm7.bin \
+		-r7 0x2380000 -e7 0x2380000 \
+		-r9 0x2000450 -e9 0x2000450 -h 0x200 \
+		-g "ENG0"
+	@echo "  DLDI    $@"
+	$(_V)$(DLDIPATCH) patch $(NDSROM_DSONE_DLDI) $@
 
 $(NDSROM_R4): $(NDSROM) $(NDSROM_R4_DLDI) $(SCRIPT_R4CRYPT)
 	@$(MKDIR) -p $(@D)

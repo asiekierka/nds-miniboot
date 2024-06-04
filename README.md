@@ -13,9 +13,16 @@ flashcart's memory card:
 
 | Device | Directory |
 | ------ | --------- |
+| Ace3DS+ / Ace3DS X | ace3dsplus |
 | Acekard 2/2i | generic |
 | Gateway Blue | gwblue |
 | R4 (original) | generic |
+| R4 i.L.S. | ace3dsplus |
+| R4/R4i Ultra | r4itt |
+| R4iDSN | r4idsn |
+| R4iTT 3DS | r4itt |
+| r4ids.cn | r4itt |
+| SuperCard DSONE | generic |
 
 ### Troubleshooting
 
