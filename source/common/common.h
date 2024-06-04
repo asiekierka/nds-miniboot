@@ -97,8 +97,14 @@ size_t strlen(const char * s); // used by nanoprintf
 
 typedef struct {
     char game_title[12];
-    char game_code[4];
-    char maker_code[2];
+    union {
+        char game_code[4];
+        uint32_t game_code_i;
+    };
+    union {
+        char maker_code[2];
+        uint16_t maker_code_i;
+    };
     uint8_t unit_code;
     uint8_t _ignored_1[0x20 - 0x13];
     uint32_t arm9_offset;

@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "bios.h"
+#include "dka.h"
 #include "dldi_patch.h"
 #include "ff.h"
 #include "console.h"
@@ -52,6 +53,8 @@ void ipc_arm7_cmd(uint32_t cmd) {
     while (last_sync == next_sync) next_sync = REG_IPCSYNC & 0xF;
 }
 
+const char *executable_path = "/BOOT.NDS";
+
 int main(void) {
     FIL fp;
     unsigned int bytes_read;
@@ -94,7 +97,7 @@ int main(void) {
     dprintf("Mounting FAT filesystem... ");
     checkErrorFatFs("Could not mount FAT filesystem", f_mount(&fs, "", 1));
     dprintf("OK\n");
-    checkErrorFatFs("Could not find BOOT.NDS", f_open(&fp, "/BOOT.NDS", FA_READ));
+    checkErrorFatFs("Could not find BOOT.NDS", f_open(&fp, executable_path, FA_READ));
     dprintf("BOOT.NDS found.\n");
 
     // Read the .nds file header.
@@ -156,6 +159,12 @@ int main(void) {
             while(1);
         }
     }
+
+    // Set up argv.
+    DKA_ARGV->cmdline = (char*) 0x2FFFEB0;
+    DKA_ARGV->cmdline_size = strlen(executable_path) + 1;
+    __aeabi_memcpy(DKA_ARGV->cmdline, executable_path, DKA_ARGV->cmdline_size);
+    DKA_ARGV->magic = ARGV_MAGIC;
 
     dprintf("Launching");
 
