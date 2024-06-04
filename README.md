@@ -22,6 +22,7 @@ flashcart's memory card:
 | EZ-Flash Parallel | generic | |
 | EZ-Flash V | generic | |
 | Gateway Blue | gwblue | |
+| iSmart Premium | generic | |
 | iTouchDS | m3ds | No bootstub support |
 | M3 DS Real | m3ds | No bootstub support |
 | MoonShell 2.10 | moonshl2 | Bootstub returns to MoonShell |
@@ -34,6 +35,7 @@ flashcart's memory card:
 | R4/R4i RTS (r4rts.com) | m3ds | No bootstub support |
 | r4dspro.com | r4dspro | |
 | r4ids.cn | r4itt | |
+| r4i.cn | generic |
 | R6 Gold/Silver | mkr6 | |
 | Stargate 3DS | stargate | |
 | SuperCard DSONE | generic | |
