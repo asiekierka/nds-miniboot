@@ -78,7 +78,9 @@ int dldi_patch_relocate(void *buffer, uint32_t size, DLDI_INTERFACE *driver) {
             uint8_t allocatedSize = target->allocatedSize;
             if (allocatedSize < driver->driverSize) return DLPR_NOT_ENOUGH_SPACE;
 
-            __aeabi_memcpy(target, driver, 1 << allocatedSize);
+            // Skip overwriting the magic number - the driver included as part of miniboot
+            // does not always contain it, to evade auto-DLDI patchers in previous stage bootloaders.
+            __aeabi_memcpy(((uint8_t*) target) + 4, ((uint8_t*) driver) + 4, (1 << allocatedSize) - 4);
             target->allocatedSize = allocatedSize;
             dldi_relocate(target);
             return DLPR_OK;
