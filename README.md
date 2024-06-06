@@ -25,6 +25,7 @@ flashcart's memory card:
 | R4iDSN | r4idsn |
 | R4iTT 3DS | r4itt |
 | r4ids.cn | r4itt |
+| Stargate 3DS | stargate |
 | SuperCard DSONE | generic |
 
 ### Troubleshooting

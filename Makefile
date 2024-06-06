@@ -41,6 +41,7 @@ NDSROM_EZ5_DLDI		:= blobs/dldi/ez5h.dldi
 NDSROM_GMTF_DLDI	:= blobs/dldi/gmtf.dldi
 NDSROM_R4_DLDI		:= blobs/dldi/r4tfv3.dldi
 NDSROM_R4IDSN_DLDI	:= blobs/dldi/r4idsn_sd.dldi
+NDSROM_STARGATE_DLDI	:= blobs/dldi/sg3d.dldi
 
 NDSROM_ACE3DS		:= dist/ace3dsplus/_ds_menu.dat
 NDSROM_AK2		:= dist/generic/akmenu4.nds
@@ -53,6 +54,7 @@ NDSROM_R4		:= dist/generic/_DS_MENU.DAT
 NDSROM_R4IDSN		:= dist/r4idsn/_dsmenu.dat
 NDSROM_R4ILS		:= dist/ace3dsplus/_dsmenu.dat
 NDSROM_R4ITT		:= dist/r4itt/_ds_menu.dat
+NDSROM_STARGATE		:= dist/stargate/_ds_menu.dat
 
 .PHONY: all clean arm9 arm7
 
@@ -68,7 +70,8 @@ all: \
 	$(NDSROM_R4) \
 	$(NDSROM_R4IDSN) \
 	$(NDSROM_R4ILS) \
-	$(NDSROM_R4ITT)
+	$(NDSROM_R4ITT) \
+	$(NDSROM_STARGATE)
 	$(_V)$(CP) LICENSE README.md dist/
 
 $(NDSROM_ACE3DS): $(NDSROM) $(NDSROM_ACE3DS_DLDI) $(SCRIPT_R4CRYPT)
@@ -161,6 +164,12 @@ $(NDSROM_GMTF): $(NDSROM) $(NDSROM_GMTF_DLDI)
 	@echo "  DLDI    $@"
 	$(_V)$(CP) $(NDSROM) $@
 	$(_V)$(DLDIPATCH) patch $(NDSROM_GMTF_DLDI) $@
+
+$(NDSROM_STARGATE): $(NDSROM) $(NDSROM_STARGATE_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  DLDI    $@"
+	$(_V)$(CP) $(NDSROM) $@
+	$(_V)$(DLDIPATCH) patch $(NDSROM_STARGATE_DLDI) $@
 
 $(NDSROM): arm9 arm7
 	@$(MKDIR) -p $(@D)
