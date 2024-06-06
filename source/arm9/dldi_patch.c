@@ -8,6 +8,14 @@
 #include "aeabi.h"
 #include "console.h"
 
+#define XOR_CONSTANT_VALUE 0xAA55AA55
+#define OBFUSCATED_COMPARE(a, b) \
+	(xor_constant(a, XOR_CONSTANT_VALUE) == (( \
+		(((b) & 0xFF000000) >> 24) | \
+		(((b) & 0xFF0000) >> 8) | \
+		(((b) & 0xFF00) << 8) | \
+		(((b) & 0xFF) << 24)) ^ XOR_CONSTANT_VALUE))
+
 static void dldi_relocate(DLDI_INTERFACE *io) {
     uint32_t offset;
     uint32_t **address;
@@ -71,7 +79,7 @@ int dldi_patch_relocate(void *buffer, uint32_t size, DLDI_INTERFACE *driver) {
     uint32_t *data = (uint32_t*) buffer;
     for (; size; size -= 4, data++) {
         // Obfuscate the constants, so that DLDI patchers don't catch the DLDI patching code.
-        if (__builtin_bswap32(data[0]) == 0xEDA58DBF && __builtin_bswap32(data[1]) == 0x20436869 && __builtin_bswap32(data[2]) == 0x73686d00) {
+        if (OBFUSCATED_COMPARE(data[0], 0xEDA58DBF) && OBFUSCATED_COMPARE(data[1], 0x20436869) && OBFUSCATED_COMPARE(data[2], 0x73686d00)) {
             dprintf("DLDI found at %d\n", (uint8_t*)data - (uint8_t*)buffer);
             DLDI_INTERFACE *target = (DLDI_INTERFACE*) data;
 

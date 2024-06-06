@@ -22,6 +22,9 @@ char *strchr(const char *s, int c); // used by FatFs
 size_t strlen(const char * s); // used by nanoprintf
 #include "libc/nanoprintf.h" // printf replacement, used for error logging
 
+/* === other functions === */
+uint32_t xor_constant(uint32_t a, uint32_t b); // a ^ b, implemented in ASM to prevent inlining
+
 /* === code/data attributes === */
 #define THUMB_FUNC __attribute__((target("thumb")))
 
