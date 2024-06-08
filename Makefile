@@ -37,17 +37,28 @@ SCRIPT_R4CRYPT		:= scripts/r4crypt.lua
 NDSROM_ACE3DS_DLDI	:= blobs/dldi/ace3ds_sd.dldi
 NDSROM_AK2_DLDI		:= blobs/dldi/ak2_sd.dldi
 NDSROM_DSONE_DLDI	:= blobs/dldi/scds3.dldi
+NDSROM_EZ5_DLDI		:= blobs/dldi/ez5h.dldi
+NDSROM_EZ5N_DLDI	:= blobs/dldi/ez5n.dldi
+NDSROM_GMTF_DLDI	:= blobs/dldi/gmtf.dldi
 NDSROM_R4_DLDI		:= blobs/dldi/r4tfv3.dldi
+NDSROM_R4DSPRO_DLDI	:= blobs/dldi/ak2_sd_singlewrite.dldi
 NDSROM_R4IDSN_DLDI	:= blobs/dldi/r4idsn_sd.dldi
+NDSROM_STARGATE_DLDI	:= blobs/dldi/sg3d.dldi
 
 NDSROM_ACE3DS		:= dist/ace3dsplus/_ds_menu.dat
 NDSROM_AK2		:= dist/generic/akmenu4.nds
 NDSROM_DSONE	:= dist/generic/scfw.sc
+NDSROM_EDGEI	:= dist/generic/dsedgei.dat
+NDSROM_EZ5		:= dist/generic/ez5sys.bin
+NDSROM_EZ5N		:= dist/generic/ezds.dat
+NDSROM_GMTF		:= dist/generic/bootme.nds
 NDSROM_GWBLUE		:= dist/gwblue/_dsmenu.dat
 NDSROM_R4		:= dist/generic/_DS_MENU.DAT
+NDSROM_R4DSPRO	:= dist/r4dspro/_ds_menu.dat
 NDSROM_R4IDSN		:= dist/r4idsn/_dsmenu.dat
 NDSROM_R4ILS		:= dist/ace3dsplus/_dsmenu.dat
 NDSROM_R4ITT		:= dist/r4itt/_ds_menu.dat
+NDSROM_STARGATE		:= dist/stargate/_ds_menu.dat
 
 .PHONY: all clean arm9 arm7
 
@@ -56,11 +67,17 @@ all: \
 	$(NDSROM_ACE3DS) \
 	$(NDSROM_AK2) \
 	$(NDSROM_DSONE) \
+	$(NDSROM_EDGEI) \
+	$(NDSROM_EZ5) \
+	$(NDSROM_EZ5N) \
+	$(NDSROM_GMTF) \
 	$(NDSROM_GWBLUE) \
 	$(NDSROM_R4) \
+	$(NDSROM_R4DSPRO) \
 	$(NDSROM_R4IDSN) \
 	$(NDSROM_R4ILS) \
-	$(NDSROM_R4ITT)
+	$(NDSROM_R4ITT) \
+	$(NDSROM_STARGATE)
 	$(_V)$(CP) LICENSE README.md dist/
 
 $(NDSROM_ACE3DS): $(NDSROM) $(NDSROM_ACE3DS_DLDI) $(SCRIPT_R4CRYPT)
@@ -136,11 +153,42 @@ $(NDSROM_R4): $(NDSROM) $(NDSROM_R4_DLDI) $(SCRIPT_R4CRYPT)
 	@echo "  R4CRYPT $@"
 	$(_V)$(LUA) $(SCRIPT_R4CRYPT) $@
 
-$(NDSROM_AK2): $(NDSROM) $(NDSROM_AK2_DLDI)
+$(NDSROM_AK2) $(NDSROM_EDGEI): $(NDSROM) $(NDSROM_AK2_DLDI)
 	@$(MKDIR) -p $(@D)
 	@echo "  DLDI    $@"
 	$(_V)$(CP) $(NDSROM) $@
 	$(_V)$(DLDIPATCH) patch $(NDSROM_AK2_DLDI) $@
+
+$(NDSROM_EZ5): $(NDSROM) $(NDSROM_EZ5_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  DLDI    $@"
+	$(_V)$(CP) $(NDSROM) $@
+	$(_V)$(DLDIPATCH) patch $(NDSROM_EZ5_DLDI) $@
+
+$(NDSROM_EZ5N): $(NDSROM) $(NDSROM_EZ5N_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  DLDI    $@"
+	$(_V)$(CP) $(NDSROM) $@
+	$(_V)$(DLDIPATCH) patch $(NDSROM_EZ5N_DLDI) $@
+	$(_V)sed -i "s|\xED\xA5\x8D\xBF|\x00\x00\x00\x00|g" $@
+
+$(NDSROM_GMTF): $(NDSROM) $(NDSROM_GMTF_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  DLDI    $@"
+	$(_V)$(CP) $(NDSROM) $@
+	$(_V)$(DLDIPATCH) patch $(NDSROM_GMTF_DLDI) $@
+
+$(NDSROM_R4DSPRO): $(NDSROM) $(NDSROM_R4DSPRO_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  DLDI    $@"
+	$(_V)$(CP) $(NDSROM) $@
+	$(_V)$(DLDIPATCH) patch $(NDSROM_R4DSPRO_DLDI) $@
+
+$(NDSROM_STARGATE): $(NDSROM) $(NDSROM_STARGATE_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  DLDI    $@"
+	$(_V)$(CP) $(NDSROM) $@
+	$(_V)$(DLDIPATCH) patch $(NDSROM_STARGATE_DLDI) $@
 
 $(NDSROM): arm9 arm7
 	@$(MKDIR) -p $(@D)
