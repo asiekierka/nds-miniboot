@@ -42,17 +42,22 @@ local function crypt(sector, key1, is_encrypt)
 	return result
 end
 
-local input_file = io.open(arg[1], "r+b")
+local input_file = io.open(arg[1], "rb")
+local input_data = input_file:read("a")
+input_file:close()
+input_file = io.open(arg[1], "wb")
+
 local encrypt = true
 local key = tonumber(arg[2] or "484A", 16)
 local i = 0
 
 while true do
-	local sector = input_file:read(512)
-	if sector == nil then break end
+	local sector = string.sub(input_data, i*512+1, i*512+512)
+	if (sector == nil) or (#sector <= 0) then break end
 	
-	input_file:seek("cur", 0 - #sector)
 	input_file:write(crypt(sector, (key ~ i) & 0xFFFF, encrypt))
 
 	i = i + 1
 end
+
+input_file:close()
