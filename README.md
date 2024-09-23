@@ -27,6 +27,7 @@ flashcart's memory card:
 | R4iTT 3DS | r4itt |
 | r4dspro.com | r4dspro |
 | r4ids.cn | r4itt |
+| R6 Gold/Silver | mkr6 |
 | Stargate 3DS | stargate |
 | SuperCard DSONE | generic |
 

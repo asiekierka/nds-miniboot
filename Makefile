@@ -40,6 +40,7 @@ NDSROM_DSONE_DLDI	:= blobs/dldi/scds3.dldi
 NDSROM_EZ5_DLDI		:= blobs/dldi/ez5h.dldi
 NDSROM_EZ5N_DLDI	:= blobs/dldi/ez5n.dldi
 NDSROM_GMTF_DLDI	:= blobs/dldi/gmtf.dldi
+NDSROM_MKR6_DLDI	:= blobs/dldi/nmk6.dldi
 NDSROM_R4_DLDI		:= blobs/dldi/r4tfv3.dldi
 NDSROM_R4DSPRO_DLDI	:= blobs/dldi/ak2_sd_singlewrite.dldi
 NDSROM_R4IDSN_DLDI	:= blobs/dldi/r4idsn_sd.dldi
@@ -53,6 +54,7 @@ NDSROM_EZ5		:= dist/generic/ez5sys.bin
 NDSROM_EZ5N		:= dist/generic/ezds.dat
 NDSROM_GMTF		:= dist/generic/bootme.nds
 NDSROM_GWBLUE		:= dist/gwblue/_dsmenu.dat
+NDSROM_MKR6		:= dist/mkr6/_boot_ds.nds
 NDSROM_R4		:= dist/generic/_DS_MENU.DAT
 NDSROM_R4DSPRO	:= dist/r4dspro/_ds_menu.dat
 NDSROM_R4IDSN		:= dist/r4idsn/_dsmenu.dat
@@ -72,6 +74,7 @@ all: \
 	$(NDSROM_EZ5N) \
 	$(NDSROM_GMTF) \
 	$(NDSROM_GWBLUE) \
+	$(NDSROM_MKR6) \
 	$(NDSROM_R4) \
 	$(NDSROM_R4DSPRO) \
 	$(NDSROM_R4IDSN) \
@@ -123,6 +126,16 @@ $(NDSROM_R4IDSN): arm9 arm7 $(NDSROM_R4IDSN_DLDI)
 		-r9 0x2000000 -e9 0x2000000 -h 0x200
 	@echo "  DLDI    $@"
 	$(_V)$(DLDIPATCH) patch $(NDSROM_R4IDSN_DLDI) $@
+
+$(NDSROM_MKR6): arm9 arm7 $(NDSROM_MKR6_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  NDSTOOL $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-9 build/arm9.bin -7 build/arm7.bin \
+		-r7 0x2380000 -e7 0x2380000 \
+		-r9 0x2000000 -e9 0x2000000 -h 0x200
+	@echo "  DLDI    $@"
+	$(_V)$(DLDIPATCH) patch $(NDSROM_MKR6_DLDI) $@
 
 $(NDSROM_R4ITT): arm9 arm7 $(NDSROM_AK2_DLDI)
 	@$(MKDIR) -p $(@D)
