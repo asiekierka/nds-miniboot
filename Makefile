@@ -39,6 +39,8 @@ SCRIPT_R4CRYPT		:= scripts/r4crypt.lua
 NDSROM_ACE3DS_DLDI	:= blobs/dldi/ace3ds_sd.dldi
 NDSROM_AK2_DLDI		:= blobs/dldi/ak2_sd.dldi
 NDSROM_DSONE_DLDI	:= blobs/dldi/scds3.dldi
+NDSROM_DSONE_SDHC_DLDI	:= blobs/dldi/scdssdhc2.dldi
+NDSROM_DSTT_DLDI	:= blobs/dldi/ttio.dldi
 NDSROM_EZ5_DLDI		:= blobs/dldi/ez5h.dldi
 NDSROM_EZ5N_DLDI	:= blobs/dldi/ez5n.dldi
 NDSROM_GMTF_DLDI	:= blobs/dldi/gmtf.dldi
@@ -51,6 +53,8 @@ NDSROM_STARGATE_DLDI	:= blobs/dldi/sg3d.dldi
 NDSROM_ACE3DS		:= dist/ace3dsplus/_ds_menu.dat
 NDSROM_AK2		:= dist/generic/akmenu4.nds
 NDSROM_DSONE	:= dist/generic/scfw.sc
+NDSROM_DSONE_SDHC	:= dist/dsonesdhc/scfw.sc
+NDSROM_DSTT		:= dist/generic/ttmenu.dat
 NDSROM_EDGEI	:= dist/generic/dsedgei.dat
 NDSROM_EZ5		:= dist/generic/ez5sys.bin
 NDSROM_EZ5N		:= dist/generic/ezds.dat
@@ -61,6 +65,7 @@ NDSROM_R4		:= dist/generic/_DS_MENU.DAT
 NDSROM_R4DSPRO	:= dist/r4dspro/_ds_menu.dat
 NDSROM_R4IDSN		:= dist/r4idsn/_dsmenu.dat
 NDSROM_R4ILS		:= dist/ace3dsplus/_dsmenu.dat
+NDSROM_R4ISDHC		:= dist/generic/r4.dat
 NDSROM_R4ITT		:= dist/r4itt/_ds_menu.dat
 NDSROM_STARGATE		:= dist/stargate/_ds_menu.dat
 
@@ -71,6 +76,8 @@ all: \
 	$(NDSROM_ACE3DS) \
 	$(NDSROM_AK2) \
 	$(NDSROM_DSONE) \
+	$(NDSROM_DSONE_SDHC) \
+	$(NDSROM_DSTT) \
 	$(NDSROM_EDGEI) \
 	$(NDSROM_EZ5) \
 	$(NDSROM_EZ5N) \
@@ -81,6 +88,7 @@ all: \
 	$(NDSROM_R4DSPRO) \
 	$(NDSROM_R4IDSN) \
 	$(NDSROM_R4ILS) \
+	$(NDSROM_R4ISDHC) \
 	$(NDSROM_R4ITT) \
 	$(NDSROM_STARGATE)
 	$(_V)$(CP) LICENSE README.md dist/
@@ -160,6 +168,27 @@ $(NDSROM_DSONE): arm9 arm7 $(NDSROM_DSONE_DLDI)
 	@echo "  DLDI    $@"
 	$(_V)$(DLDIPATCH) patch $(NDSROM_DSONE_DLDI) $@
 
+$(NDSROM_DSONE_SDHC): arm9 arm7 $(NDSROM_DSONE_SDHC_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  NDSTOOL $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-9 build/arm9.bin -7 build/arm7.bin \
+		-r7 0x2380000 -e7 0x2380000 \
+		-r9 0x2000450 -e9 0x2000450 -h 0x200 \
+		-g "ENG0"
+	@echo "  DLDI    $@"
+	$(_V)$(DLDIPATCH) patch $(NDSROM_DSONE_SDHC_DLDI) $@
+
+$(NDSROM_R4ISDHC): arm9_r4isdhc arm7 $(NDSROM_DSTT_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  NDSTOOL $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-9 build/arm9_r4isdhc.bin -7 build/arm7.bin \
+		-r7 0x2380000 -e7 0x2380000 \
+		-r9 0x2000000 -e9 0x2000450 -h 0x200
+	@echo "  DLDI    $@"
+	$(_V)$(DLDIPATCH) patch $(NDSROM_DSTT_DLDI) $@
+
 $(NDSROM_R4): $(NDSROM) $(NDSROM_R4_DLDI) $(SCRIPT_R4CRYPT)
 	@$(MKDIR) -p $(@D)
 	@echo "  DLDI    $@"
@@ -205,6 +234,12 @@ $(NDSROM_STARGATE): $(NDSROM) $(NDSROM_STARGATE_DLDI)
 	$(_V)$(CP) $(NDSROM) $@
 	$(_V)$(DLDIPATCH) patch $(NDSROM_STARGATE_DLDI) $@
 
+$(NDSROM_DSTT): $(NDSROM) $(NDSROM_DSTT_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  DLDI    $@"
+	$(_V)$(CP) $(NDSROM) $@
+	$(_V)$(DLDIPATCH) patch $(NDSROM_DSTT_DLDI) $@
+
 $(NDSROM): arm9 arm7
 	@$(MKDIR) -p $(@D)
 	@echo "  NDSTOOL $@"
@@ -225,6 +260,7 @@ arm9_r4isdhc: arm9
 	$(_V)$(CC) -o build/r4isdhc_pad.elf -nostartfiles -Tsource/misc/r4isdhc_pad.ld source/misc/r4isdhc_pad.s
 	$(_V)$(OBJCOPY) -O binary build/r4isdhc_pad.elf build/r4isdhc_pad.bin
 	$(_V)cat build/r4isdhc_pad.bin build/arm9.bin > build/arm9_r4isdhc.bin
+	$(_V)truncate -s 433264 build/arm9_r4isdhc.bin
 
 arm7:
 	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm7 --no-print-directory
