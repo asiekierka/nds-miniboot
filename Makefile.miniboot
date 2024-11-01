@@ -8,24 +8,28 @@ export BLOCKSDS ?= /opt/blocksds/core
 # Configuration
 # -------------
 
+DEFINES		:=
 SOURCEDIRS	:= source/common source/common/libc
 ASSETDIRS	:=
-ifeq ($(CPU),arm9)
+
+ifeq ($(TARGET),arm9)
+CPU		:= arm9
 SOURCEDIRS	+= fatfs/source source/arm9 source/arm9/fatfs
 ASSETDIRS	+= source/arm9
 else
-ifeq ($(CPU),arm7)
+ifeq ($(TARGET),arm7)
+CPU		:= arm7
 SOURCEDIRS	+= source/arm7
 else
-$(error no CPU defined)
+$(error no target defined)
 endif
 endif
 INCLUDEDIRS	:= $(SOURCEDIRS)
 
-BUILDDIR	:= build/$(CPU)
-BIN		:= build/$(CPU).bin
-ELF		:= build/$(CPU).elf
-MAP		:= build/$(CPU).map
+BUILDDIR	:= build/$(TARGET)
+BIN		:= build/$(TARGET).bin
+ELF		:= build/$(TARGET).elf
+MAP		:= build/$(TARGET).map
 
 # Tools
 # -----
@@ -60,13 +64,15 @@ SOURCES_C	:= $(shell find -L $(SOURCEDIRS) -maxdepth 1 -name "*.c")
 # Compiler and linker flags
 # -------------------------
 
-DEFINES		:=
-
 ifeq ($(CPU),arm9)
 DEFINES		+= -DARM9
 else
 ifeq ($(CPU),arm7)
 DEFINES		+= -DARM7
+else
+ifeq ($(CPU),arm79)
+DEFINES		+= -DARM7 -DARM9
+endif
 endif
 endif
 
@@ -78,18 +84,22 @@ ASFLAGS		:= -x assembler-with-cpp $(DEFINES) \
 		   $(INCLUDEFLAGS) -ffunction-sections -fdata-sections
 
 CFLAGS		:= -std=gnu2x $(WARNFLAGS) $(DEFINES) -ffreestanding -nostdlib \
-		   $(INCLUDEFLAGS) -ffunction-sections -fdata-sections -O2 -flto
+		   $(INCLUDEFLAGS) -ffunction-sections -fdata-sections -Oz -flto
 
 LDFLAGS		:= $(DEFINES) -Wl,-Map,$(MAP) -Wl,--gc-sections -nostdlib -lgcc \
-		   -Wl,--no-warn-rwx-segments -Tsource/$(CPU).ld -flto
+		   -Wl,--no-warn-rwx-segments -flto
 
 ifeq ($(CPU),arm9)
 CFLAGS		+= -marm -mcpu=arm946e-s+nofp
 LDFLAGS		+= -Wl,--use-blx
 else
-ifeq ($(CPU),arm7)
 CFLAGS		+= -marm -mcpu=arm7tdmi
 endif
+
+ifeq ($(CPU),arm7)
+LDFLAGS		+= -Tsource/arm7.ld
+else
+LDFLAGS		+= -Tsource/arm9.ld
 endif
 
 # Intermediate build files

@@ -213,12 +213,10 @@ $(NDSROM): arm9 arm7
 
 clean:
 	@echo "  CLEAN"
-	$(_V)$(RM) build dist
+	$(_V)$(RM) build dist	
 
 arm9:
-	$(_V)+$(MAKE) -f Makefile.miniboot CPU=arm9 --no-print-directory
+	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm9 --no-print-directory
 
 arm7:
-	$(_V)+$(MAKE) -f Makefile.miniboot CPU=arm7 --no-print-directory
-
-$(ROM): arm9 arm7
+	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm7 --no-print-directory
