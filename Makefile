@@ -11,6 +11,8 @@ export BLOCKSDS ?= /opt/blocksds/core
 LUA		:= $(WONDERFUL_TOOLCHAIN)/bin/wf-lua
 DLDIPATCH	:= $(BLOCKSDS)/tools/dldipatch/dldipatch
 NDSTOOL		:= $(BLOCKSDS)/tools/ndstool/ndstool
+CC		:= $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/bin/arm-none-eabi-gcc
+OBJCOPY		:= $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/bin/arm-none-eabi-objcopy
 CP		:= cp
 MAKE		:= make
 MKDIR		:= mkdir
@@ -217,6 +219,12 @@ clean:
 
 arm9:
 	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm9 --no-print-directory
+
+arm9_r4isdhc: arm9
+	@echo "  R4ISDHC"
+	$(_V)$(CC) -o build/r4isdhc_pad.elf -nostartfiles -Tsource/misc/r4isdhc_pad.ld source/misc/r4isdhc_pad.s
+	$(_V)$(OBJCOPY) -O binary build/r4isdhc_pad.elf build/r4isdhc_pad.bin
+	$(_V)cat build/r4isdhc_pad.bin build/arm9.bin > build/arm9_r4isdhc.bin
 
 arm7:
 	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm7 --no-print-directory
