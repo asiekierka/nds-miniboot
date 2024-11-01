@@ -31,6 +31,7 @@ flashcart's memory card:
 | R6 Gold/Silver | mkr6 |
 | Stargate 3DS | stargate |
 | SuperCard DSONE | generic |
+| SuperCard DSONE SDHC | dsonesdhc |
 | Timebomb carts | generic |
 
 ### Troubleshooting
