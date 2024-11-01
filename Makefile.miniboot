@@ -14,11 +14,13 @@ ASSETDIRS	:=
 
 ifeq ($(TARGET),arm9)
 CPU		:= arm9
+LINKSCRIPT	:= arm9
 SOURCEDIRS	+= fatfs/source source/arm9 source/arm9/fatfs
 ASSETDIRS	+= source/arm9
 else
 ifeq ($(TARGET),arm7)
 CPU		:= arm7
+LINKSCRIPT	:= arm7
 SOURCEDIRS	+= source/arm7
 else
 $(error no target defined)
@@ -87,19 +89,13 @@ CFLAGS		:= -std=gnu2x $(WARNFLAGS) $(DEFINES) -ffreestanding -nostdlib \
 		   $(INCLUDEFLAGS) -ffunction-sections -fdata-sections -Oz -flto
 
 LDFLAGS		:= $(DEFINES) -Wl,-Map,$(MAP) -Wl,--gc-sections -nostdlib -lgcc \
-		   -Wl,--no-warn-rwx-segments -flto
+		   -Wl,--no-warn-rwx-segments -Tsource/$(LINKSCRIPT).ld -flto
 
 ifeq ($(CPU),arm9)
 CFLAGS		+= -marm -mcpu=arm946e-s+nofp
 LDFLAGS		+= -Wl,--use-blx
 else
 CFLAGS		+= -marm -mcpu=arm7tdmi
-endif
-
-ifeq ($(CPU),arm7)
-LDFLAGS		+= -Tsource/arm7.ld
-else
-LDFLAGS		+= -Tsource/arm9.ld
 endif
 
 # Intermediate build files
