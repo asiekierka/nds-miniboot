@@ -16,6 +16,7 @@ flashcart's memory card:
 | Ace3DS+ / Ace3DS X | ace3dsplus |
 | Acekard 2/2i | generic |
 | Datel Games 'n' Music | generic |
+| DSTT | generic |
 | EDGEi | generic |
 | EZ-Flash Parallel | generic |
 | EZ-Flash V | generic |

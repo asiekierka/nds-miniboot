@@ -39,6 +39,7 @@ SCRIPT_R4CRYPT		:= scripts/r4crypt.lua
 NDSROM_ACE3DS_DLDI	:= blobs/dldi/ace3ds_sd.dldi
 NDSROM_AK2_DLDI		:= blobs/dldi/ak2_sd.dldi
 NDSROM_DSONE_DLDI	:= blobs/dldi/scds3.dldi
+NDSROM_DSTT_DLDI	:= blobs/dldi/ttio.dldi
 NDSROM_EZ5_DLDI		:= blobs/dldi/ez5h.dldi
 NDSROM_EZ5N_DLDI	:= blobs/dldi/ez5n.dldi
 NDSROM_GMTF_DLDI	:= blobs/dldi/gmtf.dldi
@@ -51,6 +52,7 @@ NDSROM_STARGATE_DLDI	:= blobs/dldi/sg3d.dldi
 NDSROM_ACE3DS		:= dist/ace3dsplus/_ds_menu.dat
 NDSROM_AK2		:= dist/generic/akmenu4.nds
 NDSROM_DSONE	:= dist/generic/scfw.sc
+NDSROM_DSTT		:= dist/generic/ttmenu.dat
 NDSROM_EDGEI	:= dist/generic/dsedgei.dat
 NDSROM_EZ5		:= dist/generic/ez5sys.bin
 NDSROM_EZ5N		:= dist/generic/ezds.dat
@@ -71,6 +73,7 @@ all: \
 	$(NDSROM_ACE3DS) \
 	$(NDSROM_AK2) \
 	$(NDSROM_DSONE) \
+	$(NDSROM_DSTT) \
 	$(NDSROM_EDGEI) \
 	$(NDSROM_EZ5) \
 	$(NDSROM_EZ5N) \
@@ -204,6 +207,12 @@ $(NDSROM_STARGATE): $(NDSROM) $(NDSROM_STARGATE_DLDI)
 	@echo "  DLDI    $@"
 	$(_V)$(CP) $(NDSROM) $@
 	$(_V)$(DLDIPATCH) patch $(NDSROM_STARGATE_DLDI) $@
+
+$(NDSROM_DSTT): $(NDSROM) $(NDSROM_DSTT_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  DLDI    $@"
+	$(_V)$(CP) $(NDSROM) $@
+	$(_V)$(DLDIPATCH) patch $(NDSROM_DSTT_DLDI) $@
 
 $(NDSROM): arm9 arm7
 	@$(MKDIR) -p $(@D)
