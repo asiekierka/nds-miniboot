@@ -63,6 +63,7 @@ NDSROM_R4		:= dist/generic/_DS_MENU.DAT
 NDSROM_R4DSPRO	:= dist/r4dspro/_ds_menu.dat
 NDSROM_R4IDSN		:= dist/r4idsn/_dsmenu.dat
 NDSROM_R4ILS		:= dist/ace3dsplus/_dsmenu.dat
+NDSROM_R4ISDHC		:= dist/generic/r4.dat
 NDSROM_R4ITT		:= dist/r4itt/_ds_menu.dat
 NDSROM_STARGATE		:= dist/stargate/_ds_menu.dat
 
@@ -84,6 +85,7 @@ all: \
 	$(NDSROM_R4DSPRO) \
 	$(NDSROM_R4IDSN) \
 	$(NDSROM_R4ILS) \
+	$(NDSROM_R4ISDHC) \
 	$(NDSROM_R4ITT) \
 	$(NDSROM_STARGATE)
 	$(_V)$(CP) LICENSE README.md dist/
@@ -163,6 +165,16 @@ $(NDSROM_DSONE): arm9 arm7 $(NDSROM_DSONE_DLDI)
 	@echo "  DLDI    $@"
 	$(_V)$(DLDIPATCH) patch $(NDSROM_DSONE_DLDI) $@
 
+$(NDSROM_R4ISDHC): arm9_r4isdhc arm7 $(NDSROM_DSTT_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  NDSTOOL $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-9 build/arm9_r4isdhc.bin -7 build/arm7.bin \
+		-r7 0x2380000 -e7 0x2380000 \
+		-r9 0x2000000 -e9 0x2000450 -h 0x200
+	@echo "  DLDI    $@"
+	$(_V)$(DLDIPATCH) patch $(NDSROM_DSTT_DLDI) $@
+
 $(NDSROM_R4): $(NDSROM) $(NDSROM_R4_DLDI) $(SCRIPT_R4CRYPT)
 	@$(MKDIR) -p $(@D)
 	@echo "  DLDI    $@"
@@ -234,6 +246,7 @@ arm9_r4isdhc: arm9
 	$(_V)$(CC) -o build/r4isdhc_pad.elf -nostartfiles -Tsource/misc/r4isdhc_pad.ld source/misc/r4isdhc_pad.s
 	$(_V)$(OBJCOPY) -O binary build/r4isdhc_pad.elf build/r4isdhc_pad.bin
 	$(_V)cat build/r4isdhc_pad.bin build/arm9.bin > build/arm9_r4isdhc.bin
+	$(_V)truncate -s 433264 build/arm9_r4isdhc.bin
 
 arm7:
 	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm7 --no-print-directory
