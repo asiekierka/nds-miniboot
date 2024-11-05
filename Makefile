@@ -36,18 +36,18 @@ NDSROM		:= build/miniboot.nds
 
 SCRIPT_R4CRYPT		:= scripts/r4crypt.lua
 
-NDSROM_ACE3DS_DLDI	:= blobs/dldi/ace3ds_sd.dldi
-NDSROM_AK2_DLDI		:= blobs/dldi/ak2_sd.dldi
-NDSROM_DSONE_DLDI	:= blobs/dldi/scds3.dldi
-NDSROM_DSONE_SDHC_DLDI	:= blobs/dldi/scdssdhc2.dldi
+NDSROM_ACE3DS_DLDI	:= blobs/dldi/acep.dldi
+NDSROM_AK2_DLDI		:= blobs/dldi/ak2.dldi
+NDSROM_DSONE_DLDI	:= blobs/dldi/scds.dldi
+NDSROM_DSONE_SDHC_DLDI	:= blobs/dldi/scdssdhc.dldi
 NDSROM_DSTT_DLDI	:= blobs/dldi/ttio.dldi
 NDSROM_EZ5_DLDI		:= blobs/dldi/ez5h.dldi
 NDSROM_EZ5N_DLDI	:= blobs/dldi/ez5n.dldi
 NDSROM_GMTF_DLDI	:= blobs/dldi/gmtf.dldi
 NDSROM_MKR6_DLDI	:= blobs/dldi/nmk6.dldi
-NDSROM_R4_DLDI		:= blobs/dldi/r4tfv3.dldi
-NDSROM_R4DSPRO_DLDI	:= blobs/dldi/ak2_sd_singlewrite.dldi
-NDSROM_R4IDSN_DLDI	:= blobs/dldi/r4idsn_sd.dldi
+NDSROM_R4_DLDI		:= blobs/dldi/r4tf.dldi
+NDSROM_R4DSPRO_DLDI	:= blobs/dldi/ak2_cmd24.dldi
+NDSROM_R4IDSN_DLDI	:= blobs/dldi/r4idsn.dldi
 NDSROM_STARGATE_DLDI	:= blobs/dldi/sg3d.dldi
 
 NDSROM_ACE3DS		:= dist/ace3dsplus/_ds_menu.dat
