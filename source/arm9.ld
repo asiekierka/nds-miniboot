@@ -24,7 +24,7 @@ SECTIONS {
 		*(.text .text.* .gnu.linkonce.t.*)
 		*(.rodata .rodata.* .gnu.linkonce.r.*)
 		*(.data .data.* .gnu.linkonce.d.*)
-		. = ALIGN(4);
+		. = ALIGN(512);
 		__dldi_start = .;
 		*(.dldi .dldi.*)
 		. = __dldi_start + __dldi_size;
