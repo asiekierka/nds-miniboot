@@ -18,12 +18,20 @@ LINKSCRIPT	:= arm9
 SOURCEDIRS	+= fatfs/source source/arm9 source/arm9/fatfs
 ASSETDIRS	+= source/arm9
 else
+ifeq ($(TARGET),arm9plus)
+CPU		:= arm9
+LINKSCRIPT	:= arm9
+SOURCEDIRS	+= fatfs/source source/arm9 source/arm9/fatfs
+ASSETDIRS	+= source/arm9
+DEFINES		+= -DPLUS
+else
 ifeq ($(TARGET),arm7)
 CPU		:= arm7
 LINKSCRIPT	:= arm7
 SOURCEDIRS	+= source/arm7
 else
 $(error no target defined)
+endif
 endif
 endif
 INCLUDEDIRS	:= $(SOURCEDIRS)

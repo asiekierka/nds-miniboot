@@ -69,9 +69,9 @@ NDSROM_R4ISDHC		:= dist/generic/r4.dat
 NDSROM_R4ITT		:= dist/r4itt/_ds_menu.dat
 NDSROM_STARGATE		:= dist/stargate/_ds_menu.dat
 
-.PHONY: all clean arm9 arm7
+.PHONY: all clean arm9 arm9plus arm7
 
-all: \
+all: arm9plus \
 	$(NDSROM) \
 	$(NDSROM_ACE3DS) \
 	$(NDSROM_AK2) \
@@ -254,6 +254,9 @@ clean:
 
 arm9:
 	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm9 --no-print-directory
+
+arm9plus:
+	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm9plus --no-print-directory
 
 arm9_r4isdhc: arm9
 	@echo "  R4ISDHC"
