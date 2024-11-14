@@ -16,13 +16,13 @@
 		(((b) & 0xFF00) << 8) | \
 		(((b) & 0xFF) << 24)) ^ XOR_CONSTANT_VALUE))
 
-static void dldi_relocate(DLDI_INTERFACE *io) {
+static void dldi_relocate(DLDI_INTERFACE *io, uint8_t *dldiAddress) {
     uint32_t offset;
     uint32_t **address;
     uint32_t *oldStart;
     uint32_t *oldEnd;
 
-    offset = (uint32_t) io - (uint32_t) io->dldiStart;
+    offset = (uint32_t) dldiAddress - (uint32_t) io->dldiStart;
     oldStart = io->dldiStart;
     oldEnd = io->dldiEnd;
 
@@ -83,6 +83,7 @@ int dldi_patch_relocate(void *buffer, uint32_t size, DLDI_INTERFACE *driver) {
             dprintf("DLDI found at %d\n", (uint8_t*)data - (uint8_t*)buffer);
             DLDI_INTERFACE *target = (DLDI_INTERFACE*) data;
 
+            void *dldiStart = target->dldiStart;
             uint8_t allocatedSize = target->allocatedSize;
             if (allocatedSize < driver->driverSize) return DLPR_NOT_ENOUGH_SPACE;
 
@@ -90,7 +91,7 @@ int dldi_patch_relocate(void *buffer, uint32_t size, DLDI_INTERFACE *driver) {
             // does not always contain it, to evade auto-DLDI patchers in previous stage bootloaders.
             __aeabi_memcpy(((uint8_t*) target) + 4, ((uint8_t*) driver) + 4, (1 << allocatedSize) - 4);
             target->allocatedSize = allocatedSize;
-            dldi_relocate(target);
+            dldi_relocate(target, dldiStart);
             return DLPR_OK;
         }
     }
