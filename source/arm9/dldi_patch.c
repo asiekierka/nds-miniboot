@@ -18,13 +18,25 @@
 
 static void dldi_relocate(DLDI_INTERFACE *io, void *targetAddress) {
     uint32_t offset;
-    uint32_t **address;
-    uint32_t *oldStart;
-    uint32_t *oldEnd;
+    void **address;
+    void *prevAddrStart;
+    void *prevAddrSpaceEnd;
+    void *prevAddrAllocEnd;
 
     offset = (uint32_t) targetAddress - (uint32_t) io->dldiStart;
-    oldStart = io->dldiStart;
-    oldEnd = io->dldiEnd;
+    prevAddrStart = io->dldiStart;
+
+    // For GOT sections, we can safely relocate the maximum possible driver size,
+    // as that area can only include addresses.
+    prevAddrSpaceEnd = io->dldiStart + (1 << io->driverSize);
+
+    // For non-GOT sections, we need to minimize the range of addresses changed.
+    // This is either the end of the data section or the end of the BSS section,
+    // if the BSS section is valid.
+    prevAddrAllocEnd = io->dldiEnd;
+    if (io->bssStart >= prevAddrStart && io->bssStart < prevAddrSpaceEnd
+	&& io->bssEnd > io->dldiEnd && io->bssEnd <= prevAddrSpaceEnd)
+        prevAddrAllocEnd = io->bssEnd;
 
     // Correct all pointers to the offsets from the location of this interface
     io->dldiStart = ((uint8_t*) io->dldiStart) + offset;
@@ -45,26 +57,24 @@ static void dldi_relocate(DLDI_INTERFACE *io, void *targetAddress) {
 
     // Fix all addresses with in the DLDI
     if (io->fixSectionsFlags & FIX_ALL) {
-        for (address = (uint32_t**) io->dldiStart; address < (uint32_t**) io->dldiEnd; address++) {
-            if (oldStart <= *address && *address < oldEnd)
+        for (address = (void**) io->dldiStart; address < (void**) io->dldiEnd; address++) {
+            if (prevAddrStart <= *address && *address < prevAddrAllocEnd)
                 *address += offset;
         }
     }
 
     // Fix the interworking glue section
     if (io->fixSectionsFlags & FIX_GLUE) {
-        address = (uint32_t**) io->interworkStart;
-
-        for (; address < (uint32_t**) io->interworkEnd; address++) {
-            if (oldStart <= *address && *address < oldEnd)
+        for (address = (void**) io->interworkStart; address < (void**) io->interworkEnd; address++) {
+            if (prevAddrStart <= *address && *address < prevAddrAllocEnd)
                 *address += offset;
         }
     }
 
     // Fix the global offset table section
     if (io->fixSectionsFlags & FIX_GOT) {
-        for (address = (uint32_t**) io->gotStart; address < (uint32_t**) io->gotEnd; address++) {
-            if (oldStart <= *address && *address < oldEnd)
+        for (address = (void**) io->gotStart; address < (void**) io->gotEnd; address++) {
+            if (prevAddrStart <= *address && *address < prevAddrSpaceEnd)
                 *address += offset;
         }
     }
