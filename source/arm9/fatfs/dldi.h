@@ -40,14 +40,14 @@ typedef struct DLDI_INTERFACE {
     char friendlyName [DLDI_FRIENDLY_NAME_LEN];
 
     // Pointers to sections that need address fixing
-    void *dldiStart;
-    void *dldiEnd;
-    void *interworkStart;
-    void *interworkEnd;
-    void *gotStart;
-    void *gotEnd;
-    void *bssStart;
-    void *bssEnd;
+    uint8_t *dldiStart;
+    uint8_t *dldiEnd;
+    uint8_t *interworkStart;
+    uint8_t *interworkEnd;
+    uint8_t *gotStart;
+    uint8_t *gotEnd;
+    uint8_t *bssStart;
+    uint8_t *bssEnd;
 
     // Original I/O interface data
     uint32_t ioType;
