@@ -50,11 +50,8 @@ will only continue once you release START.
 ## Development
 
 To build miniboot, the [Wonderful toolchain](https://wonderful.asie.pl/)'s
-`wf-tools`, `toolchain-gcc-arm-none-eabi`, as well as BlocksDS (for
-`ndstool` and `dldipatch`) are required. They can be installed with the
-following command:
-
-    $ wf-pacman -Sy toolchain-gcc-arm-none-eabi thirdparty-blocksds wf-tools
+`wf-tools`, `toolchain-gcc-arm-none-eabi`, as well as [BlocksDS](https://blocksds.skylyrac.net/docs/setup/options/) 1.7.0+ (for
+`ndstool` and `dldipatch`) are required. Please follow their respective installation instructions.
 
 ### Motivation
 
