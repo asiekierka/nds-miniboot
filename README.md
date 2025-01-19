@@ -12,7 +12,7 @@ Copy the contents of the specified directory to the root of your
 flashcart's memory card:
 
 | Device | Directory | Notes |
-| ------ | --------- | |
+| ------ | --------- | ----- |
 | Ace3DS+ / Ace3DS X | ace3dsplus | |
 | Acekard 2/2i | generic | |
 | Datel Games 'n' Music | generic | |
@@ -37,6 +37,10 @@ flashcart's memory card:
 | SuperCard DSONE | generic | |
 | SuperCard DSONE SDHC | dsonesdhc | |
 | Various timebomb carts | generic | |
+
+Notes:
+
+- "No bootstub support" means that nds-miniboot does not install its own bootstub, enabling homebrew to return to the boot program on exit. As most people chain nds-miniboot with a menu that adds its own bootstub (like nds-hb-menu), this is not a problem in practice for most users.
 
 ### Troubleshooting
 
