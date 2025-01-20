@@ -212,7 +212,7 @@ $(NDSROM_M3DS_BASE): arm9_nobootstub arm7 $(NDSROM_M3DS_DLDI) $(SCRIPT_DSBIZE)
 $(NDSROM_M3DS): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
 	@$(MKDIR) -p $(@D)
 	@echo "  XORCRYP $@"
-	cp $(NDSROM_M3DS_BASE) $@
+	$(_V)$(CP) $(NDSROM_M3DS_BASE) $@
 	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 12
 	@# M3 firmware checks the existence of this file but does nothing with it.
 	@# The original kernel does check it, but our goal is to replace that.
@@ -221,25 +221,25 @@ $(NDSROM_M3DS): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
 $(NDSROM_ITDS_ENG): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
 	@$(MKDIR) -p $(@D)
 	@echo "  XORCRYP $@"
-	cp $(NDSROM_M3DS_BASE) $@
+	$(_V)$(CP) $(NDSROM_M3DS_BASE) $@
 	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 32
 
 $(NDSROM_ITDS_GB): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
 	@$(MKDIR) -p $(@D)
 	@echo "  XORCRYP $@"
-	cp $(NDSROM_M3DS_BASE) $@
+	$(_V)$(CP) $(NDSROM_M3DS_BASE) $@
 	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 33
 
 $(NDSROM_ITDS_JP): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
 	@$(MKDIR) -p $(@D)
 	@echo "  XORCRYP $@"
-	cp $(NDSROM_M3DS_BASE) $@
+	$(_V)$(CP) $(NDSROM_M3DS_BASE) $@
 	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 37
 
 $(NDSROM_R4IRTSB) $(NDSROM_R4RTS): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
 	@$(MKDIR) -p $(@D)
 	@echo "  XORCRYP $@"
-	cp $(NDSROM_M3DS_BASE) $@
+	$(_V)$(CP) $(NDSROM_M3DS_BASE) $@
 	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 72
 
 $(NDSROM_R4ISDHC): arm9_r4isdhc arm7 $(NDSROM_DSTT_DLDI)
