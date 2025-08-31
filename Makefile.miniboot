@@ -135,7 +135,7 @@ all: $(BIN)
 
 $(BIN): $(ELF)
 	@echo "  BIN     $@"
-	$(V)$(OBJCOPY) -O binary $(ELF) $(BIN)
+	$(_V)$(OBJCOPY) -O binary $(ELF) $(BIN)
 
 $(ELF): $(OBJS)
 	@echo "  LINK    $@"
