@@ -10,7 +10,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    container: skylyrac/blocksds:slim-v1.7.3
+    container: skylyrac/blocksds:slim-v1.13.1
     steps:
       - name: Clone project
         uses: actions/checkout@v4
