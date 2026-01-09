@@ -3,32 +3,35 @@
 
 OUTPUT_FORMAT("elf32-littlearm")
 OUTPUT_ARCH(arm)
-ENTRY(_start)
+ENTRY(_start_ram)
 
 MEMORY {
-	RAM  : ORIGIN = 0x03800000, LENGTH = 64K
+	ARM7RAM  : ORIGIN = 0x03800000, LENGTH = 64K
+	MAINRAM  : ORIGIN = 0x02380000, LENGTH = 64K
 }
 
 SECTIONS {
 	.text : ALIGN(4) {
-		*(.start)
+		KEEP(*(.start))
 		*(.text .text.* .gnu.linkonce.t.*)
 		*(.rodata .rodata.* .gnu.linkonce.r.*)
 		*(.data .data.* .gnu.linkonce.d.*)
 		. = ALIGN(512);
-	} >RAM
+	} >ARM7RAM AT>MAINRAM
+
+	_start_ram = LOADADDR(.text) + (_start - ADDR(.text));
 
 	.bss (NOLOAD) : ALIGN(4) {
 		*(.arguments)
 		*(.bss .bss.* .gnu.linkonce.b.*)
 		*(COMMON)
 		. = ALIGN(. != 0 ? 4 : 1);
-	} >RAM
+	} >ARM7RAM
 
 	.noinit (NOLOAD) : ALIGN(4) {
 		*(.noinit .noinit.* .gnu.linkonce.n.*)
 		. = ALIGN(. != 0 ? 4 : 1);
-	} >RAM
+	} >ARM7RAM
 
 	__bss_start = ADDR(.bss);
 	__bss_chunks = (SIZEOF(.bss) + 31) >> 5;

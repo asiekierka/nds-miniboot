@@ -8,8 +8,16 @@
     .arm
     .syntax unified
 
-    .global _start
+#ifdef FRIENDLY
+    .section .ntr_pad, "a"
+     .zero 2048
+
+    .section .twl_pad, "a"
+     .zero 512
+#endif
+
     .section .start, "ax"
+    .global _start
 _start:
     // Vectors + jump to crt0.
     b .Lstart_real

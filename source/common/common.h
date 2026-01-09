@@ -128,4 +128,20 @@ typedef struct {
  */
 #define NDS_HEADER    ((nds_header_t*) 0x27FFE00)
 
+#define REG_ROMSPICNT  (*((volatile uint8_t*) 0x40001A0))
+#define REG_ROMMCNT    (*((volatile uint8_t*) 0x40001A1))
+#define REG_ROMSPIDATA (*((volatile uint8_t*) 0x40001A2))
+#define REG_ROMCNT     (*((volatile uint32_t*) 0x40001A4))
+
+#define ROMMCNT_MODE_ROM 0x00
+#define ROMMCNT_MODE_SPI 0x20
+#define ROMMCNT_ENABLE   0x80
+
+#define REG_ROMCMD    (*((volatile uint64_t*) 0x40001A8))
+#define REG_ROMCMD8   (((volatile uint8_t*) 0x40001A8))
+
+static inline void slot1_set_command(uint64_t command) {
+    REG_ROMCMD = __builtin_bswap64(command);
+}
+
 #endif /* __COMMON_H__ */

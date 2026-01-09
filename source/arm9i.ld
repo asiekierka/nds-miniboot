@@ -3,12 +3,18 @@
 
 OUTPUT_FORMAT("elf32-littlearm")
 OUTPUT_ARCH(arm)
-ENTRY(_start)
+ENTRY(_start_ram)
+
+PHDRS {
+	CODE    PT_LOAD FLAGS(7);
+	PAD_TWL PT_LOAD FLAGS(0x100007);
+}
 
 MEMORY {
-	ITCM : ORIGIN = 0x01000000, LENGTH = 32K
+	ITCM : ORIGIN = 0x00FFF800, LENGTH = 32K + 512
 	DTCM : ORIGIN = 0x0E000000, LENGTH = 16K
-	RAM  : ORIGIN = 0x02000000, LENGTH = 3840K
+	RAM  : ORIGIN = 0x02004000, LENGTH = 3824K
+	RAM_TWL : ORIGIN = 0x02400000, LENGTH = 12032K
 }
 
 SECTIONS {
@@ -18,8 +24,9 @@ SECTIONS {
 
 	/* === ITCM === */
 
-	/* Keep everything in one section to make objcopy work fine. */
 	.text : ALIGN(4) {
+		KEEP(*(.ntr_pad))
+
 		KEEP(*(.start))
 		*(.text .text.* .gnu.linkonce.t.*)
 		*(.rodata .rodata.* .gnu.linkonce.r.*)
@@ -28,8 +35,9 @@ SECTIONS {
 		__dldi_start = .;
 		*(.dldi .dldi.*)
 		. = __dldi_start + __dldi_size;
-		. = ALIGN(512);
-	} >ITCM AT>RAM
+	} >ITCM AT>RAM :CODE
+
+	_start_ram = LOADADDR(.text) + (_start - ADDR(.text));
 
 	/* === DTCM === */
 
@@ -38,12 +46,16 @@ SECTIONS {
 		*(.bss .bss.* .gnu.linkonce.b.*)
 		*(COMMON)
 		. = ALIGN(. != 0 ? 4 : 1);
-	} >DTCM AT>RAM
+	} >DTCM :NONE
 
 	.noinit (NOLOAD) : ALIGN(4) {
 		*(.noinit .noinit.* .gnu.linkonce.n.*)
 		. = ALIGN(. != 0 ? 4 : 1);
-	} >DTCM AT>RAM
+	} >DTCM :NONE
+
+	.twl_pad : {
+		KEEP(*(.twl_pad))
+	} >RAM_TWL :PAD_TWL
 
 	__itcm_start = ADDR(.text);
 	__itcm_chunks = (SIZEOF(.text) + 31) >> 5;

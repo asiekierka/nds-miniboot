@@ -12,36 +12,52 @@ DEFINES		:=
 SOURCEDIRS	:= source/common source/common/libc
 ASSETDIRS	:=
 
+ARM9_SOURCEDIRS := fatfs/source source/arm9 source/arm9/fatfs source/arm9/hw
+ARM7_SOURCEDIRS := source/arm7
+
+CPU		:= unknown
+
 ifeq ($(TARGET),arm9)
 CPU		:= arm9
 LINKSCRIPT	:= arm9
-SOURCEDIRS	+= fatfs/source source/arm9 source/arm9/fatfs
+SOURCEDIRS	+= $(ARM9_SOURCEDIRS)
 ASSETDIRS	+= source/arm9
-else
+endif
+
 ifeq ($(TARGET),arm9plus)
 CPU		:= arm9
 LINKSCRIPT	:= arm9
-SOURCEDIRS	+= fatfs/source source/arm9 source/arm9/fatfs
+SOURCEDIRS	+= $(ARM9_SOURCEDIRS)
 ASSETDIRS	+= source/arm9
 DEFINES		+= -DPLUS
-else
+endif
+
 ifeq ($(TARGET),arm9_nobootstub)
 CPU		:= arm9
 LINKSCRIPT	:= arm9
-SOURCEDIRS	+= fatfs/source source/arm9 source/arm9/fatfs
+SOURCEDIRS	+= $(ARM9_SOURCEDIRS)
 ASSETDIRS	+= source/arm9
 DEFINES		+= -D_NO_BOOTSTUB
-else
+endif
+
+ifeq ($(TARGET),arm9i_dspico)
+CPU		:= arm9
+LINKSCRIPT	:= arm9i
+SOURCEDIRS	+= $(ARM9_SOURCEDIRS)
+ASSETDIRS	+= source/arm9
+DEFINES		+= -DPLUS -DFRIENDLY -DHW_DSPICO -DDEFAULT_BOOT_PATH=\"/_picoboot.nds\" -Wl,--defsym=__dldi_size=4096
+endif
+
 ifeq ($(TARGET),arm7)
 CPU		:= arm7
 LINKSCRIPT	:= arm7
-SOURCEDIRS	+= source/arm7
-else
-$(error no target defined)
+SOURCEDIRS	+= $(ARM7_SOURCEDIRS)
 endif
+
+ifeq ($(CPU),unknown)
+$(error invalid target or no target defined)
 endif
-endif
-endif
+
 INCLUDEDIRS	:= $(SOURCEDIRS)
 
 BUILDDIR	:= build/$(TARGET)
@@ -129,9 +145,11 @@ DEPS		:= $(OBJS:.o=.d)
 # Targets
 # -------
 
-.PHONY: all clean
+.PHONY: all elf clean
 
 all: $(BIN)
+
+elf: $(ELF)
 
 $(BIN): $(ELF)
 	@echo "  BIN     $@"

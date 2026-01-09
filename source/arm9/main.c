@@ -10,7 +10,7 @@
 #include "ff.h"
 #include "console.h"
 
-// #define DEBUG
+#define DEBUG
 
 static FATFS fs;
 
@@ -117,6 +117,11 @@ int main(void) {
     // Create a copy of the DLDI driver in VRAM before initializing it.
     // We'll make use of this copy for patching the ARM9 binary later.
     __aeabi_memcpy4(DLDI_BACKUP, &_io_dldi_stub, 16384);
+
+#ifdef HW_DSPICO
+    extern void dspico_init(void);
+    dspico_init();
+#endif
 
     // Mount the filesystem. Try to open BOOT.NDS.
     dprintf("Mounting FAT filesystem... ");

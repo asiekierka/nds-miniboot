@@ -43,6 +43,7 @@ NDSROM_ACE3DS_DLDI	:= blobs/dldi/acep.dldi
 NDSROM_AK2_DLDI		:= blobs/dldi/ak2.dldi
 NDSROM_DSONE_DLDI	:= blobs/dldi/scds.dldi
 NDSROM_DSONE_SDHC_DLDI	:= blobs/dldi/scdssdhc.dldi
+NDSROM_DSPICO_DLDI	:= blobs/dldi/DSpico.dldi
 NDSROM_DSTT_DLDI	:= blobs/dldi/ttio.dldi
 NDSROM_EZ5_DLDI		:= blobs/dldi/ez5h.dldi
 NDSROM_EZ5N_DLDI	:= blobs/dldi/ez5n.dldi
@@ -58,6 +59,7 @@ NDSROM_ACE3DS		:= dist/ace3dsplus/_ds_menu.dat
 NDSROM_AK2		:= dist/generic/akmenu4.nds
 NDSROM_DSONE	:= dist/generic/scfw.sc
 NDSROM_DSONE_SDHC	:= dist/dsonesdhc/scfw.sc
+NDSROM_DSPICO		:= dist/dspico/BOOTLOADER.nds
 NDSROM_DSTT		:= dist/generic/ttmenu.dat
 NDSROM_EDGEI	:= dist/generic/dsedgei.dat
 NDSROM_EZ5		:= dist/generic/ez5sys.bin
@@ -79,7 +81,7 @@ NDSROM_R4ITT		:= dist/r4itt/_ds_menu.dat
 NDSROM_R4RTS		:= dist/m3ds/loader.eng
 NDSROM_STARGATE		:= dist/stargate/_ds_menu.dat
 
-.PHONY: all clean arm9 arm9plus arm9_nobootstub arm7
+.PHONY: all clean arm9 arm9plus arm9_nobootstub arm9i_dspico arm7
 
 all: arm9plus \
 	$(NDSROM) \
@@ -87,6 +89,7 @@ all: arm9plus \
 	$(NDSROM_AK2) \
 	$(NDSROM_DSONE) \
 	$(NDSROM_DSONE_SDHC) \
+	$(NDSROM_DSPICO) \
 	$(NDSROM_DSTT) \
 	$(NDSROM_EDGEI) \
 	$(NDSROM_EZ5) \
@@ -303,6 +306,17 @@ $(NDSROM_DSTT): $(NDSROM) $(NDSROM_DSTT_DLDI)
 	$(_V)$(CP) $(NDSROM) $@
 	$(_V)$(DLDIPATCH) patch $(NDSROM_DSTT_DLDI) $@
 
+$(NDSROM_DSPICO): arm9i_dspico arm7
+	@$(MKDIR) -p $(@D)
+	@echo "  NDSTOOL $@"
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
+		-9 build/arm9i_dspico.elf -7 build/arm7.elf \
+		-b blobs/dspico/icon.bmp "DSpico;(miniboot)" \
+		-n 1623 1 -n1 2296 24 \
+		-g DSPI "  " "DSPICO MINIB"
+	$(_V)$(DLDIPATCH) patch $(NDSROM_DSPICO_DLDI) $@
+	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -fh $@
+
 $(NDSROM): arm9 arm7
 	@$(MKDIR) -p $(@D)
 	@echo "  NDSTOOL $@"
@@ -323,6 +337,9 @@ arm9plus:
 
 arm9_nobootstub:
 	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm9_nobootstub --no-print-directory
+
+arm9i_dspico:
+	$(_V)+$(MAKE) -f Makefile.miniboot TARGET=arm9i_dspico --no-print-directory elf
 
 arm9_r4isdhc: arm9
 	@echo "  R4ISDHC"
