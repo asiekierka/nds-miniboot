@@ -68,7 +68,9 @@ NDSROM_GWBLUE		:= dist/gwblue/_dsmenu.dat
 NDSROM_ITDS_ENG		:= dist/m3ds/boot.eng
 NDSROM_ITDS_GB		:= dist/m3ds/boot.gb
 NDSROM_ITDS_JP		:= dist/m3ds/boot.jp
-NDSROM_M3DS		:= dist/m3ds/SYSTEM/g6dsload.eng
+NDSROM_M3DS_ENG		:= dist/m3ds/SYSTEM/g6dsload.eng
+NDSROM_M3DS_GB		:= dist/m3ds/SYSTEM/g6dsload.gb
+NDSROM_M3DS_JP		:= dist/m3ds/SYSTEM/g6dsload.jp
 NDSROM_MKR6		:= dist/mkr6/_boot_ds.nds
 NDSROM_MOONSHL2		:= dist/generic/moonshl2/extlink/nds.miniboot.nds
 NDSROM_MOONSHL2_HN	:= dist/generic/moonshl2/extlink/_hn.HugeNDSLoader.nds
@@ -101,7 +103,9 @@ all: arm9plus \
 	$(NDSROM_ITDS_ENG) \
 	$(NDSROM_ITDS_GB) \
 	$(NDSROM_ITDS_JP) \
-	$(NDSROM_M3DS) \
+	$(NDSROM_M3DS_ENG) \
+	$(NDSROM_M3DS_GB) \
+	$(NDSROM_M3DS_JP) \
 	$(NDSROM_MKR6) \
 	$(NDSROM_MOONSHL2) \
 	$(NDSROM_MOONSHL2_HN) \
@@ -225,7 +229,7 @@ $(NDSROM_M3DS_BASE): arm9_nobootstub arm7 $(NDSROM_M3DS_DLDI) $(SCRIPT_DSBIZE)
 	@echo "  CRC     $@"
 	$(_V)$(BLOCKSDS)/tools/ndstool/ndstool -fh $@
 
-$(NDSROM_M3DS): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
+$(NDSROM_M3DS_ENG): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
 	@$(MKDIR) -p $(@D)
 	@echo "  XORCRYP $@"
 	$(_V)$(CP) $(NDSROM_M3DS_BASE) $@
@@ -233,6 +237,18 @@ $(NDSROM_M3DS): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
 	@# M3 firmware checks the existence of this file but does nothing with it.
 	@# The original kernel does check it, but our goal is to replace that.
 	$(_V)touch $(@D)/g6dsload.1
+
+$(NDSROM_M3DS_GB): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
+	@$(MKDIR) -p $(@D)
+	@echo "  XORCRYP $@"
+	$(_V)$(CP) $(NDSROM_M3DS_BASE) $@
+	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 23
+
+$(NDSROM_M3DS_JP): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
+	@$(MKDIR) -p $(@D)
+	@echo "  XORCRYP $@"
+	$(_V)$(CP) $(NDSROM_M3DS_BASE) $@
+	$(_V)$(LUA) $(SCRIPT_XORCRYPT) $@ 07
 
 $(NDSROM_ITDS_ENG): $(NDSROM_M3DS_BASE) $(SCRIPT_XORCRYPT)
 	@$(MKDIR) -p $(@D)
