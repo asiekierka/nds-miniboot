@@ -45,6 +45,7 @@ NDSROM_DSONE_DLDI	:= blobs/dldi/scds.dldi
 NDSROM_DSONE_SDHC_DLDI	:= blobs/dldi/scdssdhc.dldi
 NDSROM_DSTT_DLDI	:= blobs/dldi/ttio.dldi
 NDSROM_EZ5_DLDI		:= blobs/dldi/ez5h.dldi
+NDSROM_EZ5I_DLDI	:= blobs/dldi/ez5i.dldi
 NDSROM_EZ5N_DLDI	:= blobs/dldi/ez5n.dldi
 NDSROM_GMTF_DLDI	:= blobs/dldi/gmtf.dldi
 NDSROM_ISMART_DLDI	:= blobs/dldi/mati.dldi
@@ -63,6 +64,7 @@ NDSROM_DSTT		:= dist/generic/ttmenu.dat
 NDSROM_EDGEI	:= dist/generic/dsedgei.dat
 NDSROM_EX4DS	:= dist/ex4ds/_ds_menu.dat
 NDSROM_EZ5		:= dist/generic/ez5sys.bin
+NDSROM_EZ5I		:= dist/generic/ez5isys.bin
 NDSROM_EZ5N		:= dist/generic/ezds.dat
 NDSROM_GMTF		:= dist/generic/bootme.nds
 NDSROM_GWBLUE		:= dist/gwblue/_dsmenu.dat
@@ -100,6 +102,7 @@ all: arm9plus \
 	$(NDSROM_EDGEI) \
 	$(NDSROM_EX4DS) \
 	$(NDSROM_EZ5) \
+	$(NDSROM_EZ5I) \
 	$(NDSROM_EZ5N) \
 	$(NDSROM_GMTF) \
 	$(NDSROM_GWBLUE) \
@@ -308,6 +311,12 @@ $(NDSROM_EZ5): $(NDSROM) $(NDSROM_EZ5_DLDI)
 	@echo "  DLDI    $@"
 	$(_V)$(CP) $(NDSROM) $@
 	$(_V)$(DLDIPATCH) patch $(NDSROM_EZ5_DLDI) $@
+
+$(NDSROM_EZ5I): $(NDSROM) $(NDSROM_EZ5I_DLDI)
+	@$(MKDIR) -p $(@D)
+	@echo "  DLDI    $@"
+	$(_V)$(CP) $(NDSROM) $@
+	$(_V)$(DLDIPATCH) patch $(NDSROM_EZ5I_DLDI) $@
 
 $(NDSROM_ISMART) $(NDSROM_R4ICN): $(NDSROM) $(NDSROM_ISMART_DLDI)
 	@$(MKDIR) -p $(@D)

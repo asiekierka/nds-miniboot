@@ -21,6 +21,7 @@ flashcart's memory card:
 | EX4DS | ex4ds | |
 | EZ-Flash Parallel | generic | |
 | EZ-Flash V | generic | |
+| EZ-Flash Vi | generic | |
 | Gateway Blue | gwblue | |
 | iSmart Premium | generic | |
 | iTouchDS | m3ds | No bootstub support |
